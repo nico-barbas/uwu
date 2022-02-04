@@ -16,6 +16,7 @@ type Context struct {
 	head      *winNode
 	actives   [ctxWindowCap]*Window
 	count     int
+	input     inputData
 }
 
 // Internal data used for the window free list.

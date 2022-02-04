@@ -13,9 +13,9 @@ type WidgetList struct {
 func (w *WidgetList) initList(style Style) {
 	w.style = style
 	switch w.style.Ordering {
-	case StyleOrderingRow:
+	case StyleOrderRow:
 		w.ptr = style.Margin[0]
-	case StyleOrderingColumn:
+	case StyleOrderColumn:
 		w.ptr = style.Margin[1]
 	}
 
@@ -28,12 +28,12 @@ func (w *WidgetList) addWidget(parent Node, pRect Rectangle, wgt Widget, len int
 
 	rect := Rectangle{}
 	switch w.style.Ordering {
-	case StyleOrderingRow:
+	case StyleOrderRow:
 		rect = Rectangle{
 			X: pRect.X + w.style.Margin[0], Y: pRect.Y + w.ptr,
 			Width: pRect.Width - (w.style.Margin[0] * 2), Height: float64(len),
 		}
-	case StyleOrderingColumn:
+	case StyleOrderColumn:
 		rect = Rectangle{
 			X: pRect.X + w.ptr, Y: pRect.Y + w.style.Margin[1],
 			Width: float64(len), Height: pRect.Height - (w.style.Margin[1] * 2),

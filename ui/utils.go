@@ -56,17 +56,24 @@ type (
 
 	BackgroundKind int
 	Background     struct {
+		// Shared fields
 		Visible bool
 		Kind    BackgroundKind
 		Clr     Color
-		Img     Image
-		Constr  Constraint
+
+		// ImageSlice fields
+		Img    Image
+		Constr Constraint
 	}
 )
 
+func (r Rectangle) pointInBounds(p Point) bool {
+	return (p[0] >= r.X && p[0] <= r.Y+r.Width) && (p[1] >= r.Y && p[1] <= r.Y+r.Height)
+}
+
 const (
-	StyleOrderingRow StyleOrderingKind = iota
-	StyleOrderingColumn
+	StyleOrderRow StyleOrderingKind = iota
+	StyleOrderColumn
 )
 
 const (
@@ -90,6 +97,8 @@ func (b Background) entry(rect Rectangle) RenderEntry {
 	return result
 }
 
+//
+// Rendering types and utility
 //
 
 const (
@@ -148,4 +157,40 @@ func (r *renderBuffer) flushBuffer() []RenderEntry {
 	result := r.data[:r.count]
 	r.count = 0
 	return result
+}
+
+//
+// Input types and utility
+//
+
+type (
+	inputData struct {
+		mPos          Point
+		mLeft         bool
+		previousmPos  Point
+		previousmLeft bool
+	}
+)
+
+func (i *inputData) updateInput(mpos Point, mleft bool) {
+	i.previousmPos = i.mPos
+	i.previousmLeft = i.mLeft
+	i.mPos = mpos
+	i.mLeft = mleft
+}
+
+func mousePosition() Point {
+	return ctx.input.mPos
+}
+
+func isMousePressed() bool {
+	return ctx.input.mLeft
+}
+
+func isMouseJustPressed() bool {
+	return ctx.input.mLeft && (ctx.input.mLeft != ctx.input.previousmLeft)
+}
+
+func isMouseJustReleased() bool {
+	return !ctx.input.mLeft && (ctx.input.mLeft != ctx.input.previousmLeft)
 }

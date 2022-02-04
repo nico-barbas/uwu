@@ -51,11 +51,29 @@ func main() {
 			Active: true,
 			Rect:   ui.Rectangle{300, 100, 350, 200},
 			Style: ui.Style{
-				Ordering: ui.StyleOrderingColumn,
+				Ordering: ui.StyleOrderColumn,
 				Padding:  3,
-				Margin:   ui.Point{5, 5},
+				Margin:   ui.Point{3, 3},
 			},
 			Background: ui.Background{
+				Visible: true,
+				Kind:    ui.BackgroundImageSlice,
+				Clr:     ui.Color{255, 255, 255, 255},
+				Img:     &uiPatch,
+				Constr:  ui.Constraint{2, 2, 2, 2},
+			},
+
+			HasHeader:    true,
+			HeaderHeight: 18,
+			HeaderBackground: ui.Background{
+				Visible: true,
+				Kind:    ui.BackgroundImageSlice,
+				Clr:     ui.Color{255, 142, 176, 255},
+				Img:     &uiPatch,
+				Constr:  ui.Constraint{2, 2, 2, 2},
+			},
+			HasCloseBtn: true,
+			CloseBtn: ui.Background{
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
 				Clr:     ui.Color{255, 255, 255, 255},
@@ -73,7 +91,7 @@ func main() {
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Style: ui.Style{
-			Ordering: ui.StyleOrderingRow,
+			Ordering: ui.StyleOrderRow,
 			Padding:  3,
 			Margin:   ui.Point{5, 5},
 		},
