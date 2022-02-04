@@ -11,7 +11,7 @@ const ctxWindowCap = 50
 var ctx *Context
 
 type Context struct {
-	renderBuf RenderBuffer
+	renderBuf renderBuffer
 	winBuf    [ctxWindowCap]winNode
 	head      *winNode
 	actives   [ctxWindowCap]*Window

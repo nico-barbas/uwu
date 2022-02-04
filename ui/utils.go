@@ -16,12 +16,16 @@ type Node interface {
 // over the user native types for fonts and images
 type (
 	Font interface {
-		MeasureText(text string) Point
+		MeasureText(text string, size float64) Point
 	}
 
 	Image interface {
 		GetWidth() float64
 		GetHeight() float64
+	}
+
+	Canvas interface {
+		Draw() Image
 	}
 )
 
@@ -98,35 +102,49 @@ const (
 type (
 	RenderCommand int
 
+	// A type describing a draw command.
+	//
+	// It is a "fat" struct since Go doesn't have
+	// a sum type and the size of the struct is still
+	// relatively small.
+	//
+	// <Kind> is the discriminator field
 	RenderEntry struct {
-		Kind   RenderCommand
+		// The discriminator field
+		Kind RenderCommand
+		// Again no unions, so Rect is used for multiple
+		// purposes depending on the Kind:
+		// - For images, it is the destination rectangle (where to render the image)
+		// - For texts, it is both the position, and the font size (pos at .X, .Y and font size at .Height)
 		Rect   Rectangle
 		Clr    Color
 		Img    Image
 		Constr Constraint
+		Font   Font
 		Text   string
 	}
 
-	RenderBuffer struct {
+	// A buffer of RenderEntries
+	renderBuffer struct {
 		data  []RenderEntry
 		cap   int
 		count int
 	}
 )
 
-func newRenderBuffer(cap int) RenderBuffer {
-	return RenderBuffer{
+func newRenderBuffer(cap int) renderBuffer {
+	return renderBuffer{
 		data: make([]RenderEntry, cap),
 		cap:  cap,
 	}
 }
 
-func (r *RenderBuffer) addEntry(e RenderEntry) {
+func (r *renderBuffer) addEntry(e RenderEntry) {
 	r.data[r.count] = e
 	r.count += 1
 }
 
-func (r *RenderBuffer) flushBuffer() []RenderEntry {
+func (r *renderBuffer) flushBuffer() []RenderEntry {
 	result := r.data[:r.count]
 	r.count = 0
 	return result

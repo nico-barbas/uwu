@@ -20,6 +20,15 @@ func (i *Image) GetHeight() float64 {
 	return float64(i.Height)
 }
 
+type Font struct {
+	rl.Font
+}
+
+func (f *Font) MeasureText(t string, size float64) ui.Point {
+	tSize := rl.MeasureTextEx(f.Font, t, float32(size), 0)
+	return ui.Point{float64(tSize.X), float64(tSize.Y)}
+}
+
 func main() {
 	log.SetFlags(0)
 	log.SetFlags(log.Lshortfile)
@@ -29,6 +38,10 @@ func main() {
 	uiPatch := Image{
 		Texture2D: rl.LoadTexture("assets/uiPatch.png"),
 	}
+	uiFont := Font{
+		Font: rl.LoadFontEx("assets/monogram.ttf", 32, nil, 250),
+	}
+	rl.SetTextureFilter(uiFont.Font.Texture, rl.FilterPoint)
 
 	ctx := ui.NewContext()
 	ui.MakeContextCurrent(ctx)
@@ -36,7 +49,7 @@ func main() {
 	hdl := ui.AddWindow(
 		ui.Window{
 			Active: true,
-			Rect:   ui.Rectangle{300, 100, 150, 200},
+			Rect:   ui.Rectangle{300, 100, 350, 200},
 			Style: ui.Style{
 				Ordering: ui.StyleOrderingColumn,
 				Padding:  3,
@@ -65,7 +78,47 @@ func main() {
 			Margin:   ui.Point{5, 5},
 		},
 	}, 40)
-	ui.AddWidget(lyt, &ui.DebugWidget{}, 20)
+	ui.AddWidget(lyt, &ui.Label{
+		Background: ui.Background{
+			Visible: true,
+			Kind:    ui.BackgroundImageSlice,
+			Clr:     ui.Color{255, 255, 255, 255},
+			Img:     &uiPatch,
+			Constr:  ui.Constraint{2, 2, 2, 2},
+		},
+		Font: &uiFont,
+		Text: "Hello",
+		Clr:  ui.Color{0, 0, 0, 255},
+		Size: 12,
+	}, 20)
+
+	ui.AddWidget(lyt, &ui.Label{
+		Background: ui.Background{
+			Visible: true,
+			Kind:    ui.BackgroundImageSlice,
+			Clr:     ui.Color{255, 255, 255, 255},
+			Img:     &uiPatch,
+			Constr:  ui.Constraint{2, 2, 2, 2},
+		},
+		Font: &uiFont,
+		Text: "World",
+		Clr:  ui.Color{0, 0, 0, 255},
+		Size: 12,
+	}, 20)
+
+	ui.AddWidget(lyt, &ui.Label{
+		Background: ui.Background{
+			Visible: true,
+			Kind:    ui.BackgroundImageSlice,
+			Clr:     ui.Color{255, 255, 255, 255},
+			Img:     &uiPatch,
+			Constr:  ui.Constraint{2, 2, 2, 2},
+		},
+		Font: &uiFont,
+		Text: "!",
+		Clr:  ui.Color{0, 0, 0, 255},
+		Size: 12,
+	}, 20)
 
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
@@ -75,6 +128,16 @@ func main() {
 		uiBuf := ctx.DrawUI()
 		for _, e := range uiBuf {
 			switch e.Kind {
+			case ui.RenderText:
+				font := e.Font.(*Font)
+				rl.DrawTextEx(
+					font.Font,
+					e.Text,
+					rl.Vector2{float32(e.Rect.X), float32(e.Rect.Y)},
+					float32(e.Rect.Height),
+					0,
+					color.RGBA{e.Clr[0], e.Clr[1], e.Clr[2], e.Clr[3]},
+				)
 			case ui.RenderRectangle:
 				rl.DrawRectangleRec(
 					rl.Rectangle{

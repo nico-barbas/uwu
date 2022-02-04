@@ -5,12 +5,15 @@ type Widget interface {
 	setHandle(h Handle)
 	setParent(n Node)
 	setRect(r Rectangle)
+	moveBy(offset Point)
 	init()
 	update()
-	draw(buf *RenderBuffer)
+	draw(buf *renderBuffer)
 }
 
-//
+// A type to embed into every other widget types implementation
+// to avoid having to redeclare all the boilerplate fields and
+// methods
 type widgetRoot struct {
 	handle  Handle
 	wParent Node
@@ -33,15 +36,24 @@ func (w *widgetRoot) setRect(r Rectangle) {
 	w.rect = r
 }
 
+func (w *widgetRoot) moveBy(offset Point) {
+	w.rect.X += offset[0]
+	w.rect.Y += offset[1]
+}
+
+// "Virtual" methods to avoid having to redeclare it
+// for every widget implementation
 func (w *widgetRoot) init()                  {}
 func (w *widgetRoot) update()                {}
-func (w *widgetRoot) draw(buf *RenderBuffer) {}
+func (w *widgetRoot) draw(buf *renderBuffer) {}
 
+//
+// Simple Widget used for debugging purposes
 type DebugWidget struct {
 	widgetRoot
 }
 
-func (d *DebugWidget) draw(buf *RenderBuffer) {
+func (d *DebugWidget) draw(buf *renderBuffer) {
 	buf.addEntry(RenderEntry{
 		Kind: RenderRectangle,
 		Rect: d.rect,

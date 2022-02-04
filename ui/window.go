@@ -7,6 +7,10 @@ type Window struct {
 	Style      Style
 	Background Background
 	widgets    WidgetList
+
+	HasHeader        bool
+	HeaderHeight     float64
+	HeaderBackground Background
 }
 
 func (win *Window) parent() Node {
@@ -17,7 +21,7 @@ func (win *Window) initWindow() {
 	win.widgets.initList(win.Style)
 }
 
-func (win *Window) draw(buf *RenderBuffer) {
+func (win *Window) draw(buf *renderBuffer) {
 	bgEntry := win.Background.entry(win.Rect)
 	buf.addEntry(bgEntry)
 
