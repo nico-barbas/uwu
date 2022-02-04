@@ -37,18 +37,18 @@ func main() {
 		ui.Window{
 			Active: true,
 			Rect:   ui.Rectangle{300, 100, 150, 200},
+			Style: ui.Style{
+				Ordering: ui.StyleOrderingColumn,
+				Padding:  3,
+				Margin:   ui.Point{5, 5},
+			},
 			Background: ui.Background{
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
-				Clr:     ui.Color{154, 145, 0, 255},
+				Clr:     ui.Color{255, 255, 255, 255},
 				Img:     &uiPatch,
 				Constr:  ui.Constraint{2, 2, 2, 2},
 			},
-		},
-		ui.Style{
-			Ordering: ui.StyleOrderingColumn,
-			Padding:  3,
-			Margin:   ui.Point{5, 5},
 		},
 	)
 	lyt := ui.AddWidget(hdl, &ui.Layout{
@@ -70,7 +70,7 @@ func main() {
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 
-		rl.ClearBackground(rl.RayWhite)
+		rl.ClearBackground(rl.Black)
 
 		uiBuf := ctx.DrawUI()
 		for _, e := range uiBuf {

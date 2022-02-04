@@ -4,6 +4,7 @@ type Window struct {
 	handle     Handle
 	Active     bool
 	Rect       Rectangle
+	Style      Style
 	Background Background
 	widgets    WidgetList
 }
@@ -12,8 +13,8 @@ func (win *Window) parent() Node {
 	return nil
 }
 
-func (win *Window) initWindow(style Style) {
-	win.widgets.initList(style)
+func (win *Window) initWindow() {
+	win.widgets.initList(win.Style)
 }
 
 func (win *Window) draw(buf *RenderBuffer) {
