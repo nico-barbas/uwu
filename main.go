@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"log"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/nico-ec/feelsgood/ui"
@@ -20,6 +21,8 @@ func (i *Image) GetHeight() float64 {
 }
 
 func main() {
+	log.SetFlags(0)
+	log.SetFlags(log.Lshortfile)
 	rl.InitWindow(1600, 800, "Persephone")
 	rl.SetTargetFPS(60)
 
@@ -30,28 +33,39 @@ func main() {
 	ctx := ui.NewContext()
 	ui.MakeContextCurrent(ctx)
 
-	hdl := ui.AddWindow(ui.Window{
-		Active: true,
-		Rect:   ui.Rectangle{100, 100, 100, 100},
-		Background: ui.Background{
-			Visible: true,
-			Kind:    ui.BackgroundSolidColor,
-			Clr:     ui.Color{255, 255, 0, 255},
+	hdl := ui.AddWindow(
+		ui.Window{
+			Active: true,
+			Rect:   ui.Rectangle{300, 100, 150, 200},
+			Background: ui.Background{
+				Visible: true,
+				Kind:    ui.BackgroundImageSlice,
+				Clr:     ui.Color{154, 145, 0, 255},
+				Img:     &uiPatch,
+				Constr:  ui.Constraint{2, 2, 2, 2},
+			},
 		},
-	})
-
-	ui.AddWindow(ui.Window{
-		Active: true,
-		Rect:   ui.Rectangle{300, 100, 150, 200},
+		ui.Style{
+			Ordering: ui.StyleOrderingColumn,
+			Padding:  3,
+			Margin:   ui.Point{5, 5},
+		},
+	)
+	lyt := ui.AddWidget(hdl, &ui.Layout{
 		Background: ui.Background{
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
-			Clr:     ui.Color{154, 145, 0, 255},
+			Clr:     ui.Color{198, 56, 34, 255},
 			Img:     &uiPatch,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
-	})
-	ui.RemoveWindow(hdl)
+		Style: ui.Style{
+			Ordering: ui.StyleOrderingRow,
+			Padding:  3,
+			Margin:   ui.Point{5, 5},
+		},
+	}, 40)
+	ui.AddWidget(lyt, &ui.DebugWidget{}, 20)
 
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()

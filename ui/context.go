@@ -1,5 +1,7 @@
 package ui
 
+import "log"
+
 const ctxWindowCap = 50
 
 var ctx *Context
@@ -28,7 +30,7 @@ func MakeContextCurrent(c *Context) {
 	ctx = c
 }
 
-func AddWindow(w Window) Handle {
+func AddWindow(w Window, style Style) Handle {
 	node := ctx.head
 	if node == nil {
 		// OOM
@@ -41,12 +43,13 @@ func AddWindow(w Window) Handle {
 	node.win.handle = handle
 	node.next = nil
 	ctx.actives[ctx.count] = &node.win
+	ctx.actives[ctx.count].initWindow(style)
 	ctx.count += 1
 	return handle
 }
 
 func RemoveWindow(h Handle) {
-	if h.parent != nil {
+	if h.node.parent() != nil {
 		// Wrong handle kind. Means that it isn't a root Node(a Window)
 		return
 	}
@@ -65,13 +68,28 @@ func RemoveWindow(h Handle) {
 	}
 }
 
+func AddWidget(parentHandle Handle, w Widget, len int) Handle {
+	var handle Handle
+	switch p := parentHandle.node.(type) {
+	case *Window:
+		handle = p.widgets.addWidget(p, p.Rect, w, len)
+		return handle
+	case *Layout:
+		handle = p.widgets.addWidget(p, p.rect, w, len)
+	default:
+		log.SetPrefix("[UI Error]: ")
+		log.Println("Given UI Node is not a valid container")
+	}
+	return handle
+}
+
 func (c *Context) freeAllWindows() {
 	c.head = nil
 	for i := 0; i < ctxWindowCap; i += 1 {
 		node := &c.winBuf[i]
 		node.next = c.head
 		node.win = Window{
-			handle: Handle{parent: nil, id: i, gen: 0},
+			handle: Handle{node: &node.win, id: i, gen: 0},
 		}
 		c.head = node
 	}

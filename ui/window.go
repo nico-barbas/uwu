@@ -5,17 +5,20 @@ type Window struct {
 	Active     bool
 	Rect       Rectangle
 	Background Background
+	widgets    WidgetList
 }
 
-func (w *Window) parent() Node {
+func (win *Window) parent() Node {
 	return nil
 }
 
-func (w *Window) child() Node {
-	return nil
+func (win *Window) initWindow(style Style) {
+	win.widgets.initList(style)
 }
 
-func (w *Window) draw(buf *RenderBuffer) {
-	bgEntry := w.Background.backgroundEntry(w.Rect)
+func (win *Window) draw(buf *RenderBuffer) {
+	bgEntry := win.Background.entry(win.Rect)
 	buf.addEntry(bgEntry)
+
+	win.widgets.drawWidgets(buf)
 }

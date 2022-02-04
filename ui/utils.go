@@ -1,15 +1,29 @@
 package ui
 
 type Handle struct {
-	parent Node
-	id     int
-	gen    int
+	node Node
+	id   int
+	gen  uint
 }
 
 type Node interface {
 	parent() Node
-	child() Node
 }
+
+// Those are types used to keep the library
+// backend independant. They are used to place the
+// different elements, but mainly to provide a wrapper
+// over the user native types for fonts and images
+type (
+	Font interface {
+		MeasureText(text string) Point
+	}
+
+	Image interface {
+		GetWidth() float64
+		GetHeight() float64
+	}
+)
 
 // All the utility types used for simple
 // calculation and data transformations
@@ -24,13 +38,11 @@ type (
 		Width, Height float64
 	}
 
-	Font interface {
-		MeasureText(text string) Point
-	}
-
-	Image interface {
-		GetWidth() float64
-		GetHeight() float64
+	StyleOrderingKind int
+	Style             struct {
+		Ordering StyleOrderingKind
+		Padding  float64
+		Margin   Point
 	}
 
 	Constraint struct {
@@ -39,8 +51,7 @@ type (
 	}
 
 	BackgroundKind int
-
-	Background struct {
+	Background     struct {
 		Visible bool
 		Kind    BackgroundKind
 		Clr     Color
@@ -50,11 +61,16 @@ type (
 )
 
 const (
+	StyleOrderingRow StyleOrderingKind = iota
+	StyleOrderingColumn
+)
+
+const (
 	BackgroundSolidColor BackgroundKind = iota
 	BackgroundImageSlice
 )
 
-func (b Background) backgroundEntry(rect Rectangle) RenderEntry {
+func (b Background) entry(rect Rectangle) RenderEntry {
 	result := RenderEntry{
 		Rect: rect,
 		Clr:  b.Clr,
