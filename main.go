@@ -138,6 +138,20 @@ func main() {
 		Size: 12,
 	}, 20)
 
+	ui.AddWidget(hdl, &ui.Label{
+		Background: ui.Background{
+			Visible: true,
+			Kind:    ui.BackgroundImageSlice,
+			Clr:     ui.Color{198, 56, 34, 255},
+			Img:     &uiPatch,
+			Constr:  ui.Constraint{2, 2, 2, 2},
+		},
+		Font: &uiFont,
+		Text: "CANVAS GOES HERE!!",
+		Clr:  ui.Color{0, 0, 0, 255},
+		Size: 24,
+	}, ui.FitContainer)
+
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 

@@ -6,6 +6,7 @@ type Window struct {
 	handle     Handle
 	Active     bool
 	Rect       Rectangle
+	activeRect Rectangle
 	Style      Style
 	Background Background
 	widgets    WidgetList
@@ -42,11 +43,16 @@ func (win *Window) initWindow() {
 				Height: width,
 			}
 		}
-		win.Style.Margin[1] += win.HeaderHeight
 		win.headerRect = Rectangle{
 			X: win.Rect.X, Y: win.Rect.Y,
 			Width: win.Rect.Width, Height: win.HeaderHeight,
 		}
+		win.activeRect = Rectangle{
+			X: win.Rect.X, Y: win.Rect.Y + win.HeaderHeight,
+			Width: win.Rect.Width, Height: win.Rect.Height - win.HeaderHeight,
+		}
+	} else {
+		win.activeRect = win.Rect
 	}
 	win.widgets.initList(win.Style)
 }

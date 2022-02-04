@@ -108,7 +108,7 @@ func AddWidget(parentHandle Handle, w Widget, len int) Handle {
 	var handle Handle
 	switch p := parentHandle.node.(type) {
 	case *Window:
-		handle = p.widgets.addWidget(p, p.Rect, w, len)
+		handle = p.widgets.addWidget(p, p.activeRect, w, len)
 	case *Layout:
 		handle = p.widgets.addWidget(p, p.rect, w, len)
 	default:

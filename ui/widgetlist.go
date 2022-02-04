@@ -14,14 +14,14 @@ func (w *WidgetList) initList(style Style) {
 	w.style = style
 	switch w.style.Ordering {
 	case StyleOrderRow:
-		w.ptr = style.Margin[0]
+		w.ptr += style.Margin[1]
 	case StyleOrderColumn:
-		w.ptr = style.Margin[1]
+		w.ptr += style.Margin[0]
 	}
-
 }
 
-func (w *WidgetList) addWidget(parent Node, pRect Rectangle, wgt Widget, len int) Handle {
+func (w *WidgetList) addWidget(parent Node, pRect Rectangle, wgt Widget, l int) Handle {
+	len := float64(l)
 	handle := Handle{node: wgt, id: w.count, gen: w.gens[w.count]}
 	wgt.setHandle(handle)
 	wgt.setParent(parent)
@@ -29,21 +29,27 @@ func (w *WidgetList) addWidget(parent Node, pRect Rectangle, wgt Widget, len int
 	rect := Rectangle{}
 	switch w.style.Ordering {
 	case StyleOrderRow:
+		if l == FitContainer {
+			len = pRect.Height - w.ptr - w.style.Margin[1]
+		}
 		rect = Rectangle{
 			X: pRect.X + w.style.Margin[0], Y: pRect.Y + w.ptr,
-			Width: pRect.Width - (w.style.Margin[0] * 2), Height: float64(len),
+			Width: pRect.Width - (w.style.Margin[0] * 2), Height: len,
 		}
 	case StyleOrderColumn:
+		if l == FitContainer {
+			len = pRect.Width - w.ptr - w.style.Margin[0]
+		}
 		rect = Rectangle{
 			X: pRect.X + w.ptr, Y: pRect.Y + w.style.Margin[1],
-			Width: float64(len), Height: pRect.Height - (w.style.Margin[1] * 2),
+			Width: len, Height: pRect.Height - (w.style.Margin[1] * 2),
 		}
 	}
 	wgt.setRect(rect)
 	w.widgets[w.count] = wgt
 	w.gens[w.count] += 1
 	w.count += 1
-	w.ptr += float64(len) + w.style.Padding
+	w.ptr += len + w.style.Padding
 	w.widgets[w.count-1].init()
 	return handle
 }

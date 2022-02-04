@@ -71,6 +71,8 @@ func (r Rectangle) pointInBounds(p Point) bool {
 	return (p[0] >= r.X && p[0] <= r.Y+r.Width) && (p[1] >= r.Y && p[1] <= r.Y+r.Height)
 }
 
+const FitContainer = -1
+
 const (
 	StyleOrderRow StyleOrderingKind = iota
 	StyleOrderColumn
