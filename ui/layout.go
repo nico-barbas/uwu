@@ -1,7 +1,7 @@
 package ui
 
 type Layout struct {
-	WidgetRoot
+	widgetRoot
 	Background Background
 	Style      Style
 	widgets    WidgetList
