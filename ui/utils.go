@@ -29,13 +29,13 @@ type (
 	}
 
 	Image interface {
-		Width() float64
-		Height() float64
+		GetWidth() float64
+		GetHeight() float64
 	}
 
 	Constraint struct {
 		Left, Right float64
-		Up, Bottom  float64
+		Up, Down    float64
 	}
 
 	BackgroundKind int
@@ -43,8 +43,9 @@ type (
 	Background struct {
 		Visible bool
 		Kind    BackgroundKind
-		Img     Image
 		Clr     Color
+		Img     Image
+		Constr  Constraint
 	}
 )
 
@@ -64,6 +65,7 @@ func (b Background) backgroundEntry(rect Rectangle) RenderEntry {
 	case BackgroundImageSlice:
 		result.Kind = RenderImageSlice
 		result.Img = b.Img
+		result.Constr = b.Constr
 	}
 	return result
 }
@@ -81,12 +83,12 @@ type (
 	RenderCommand int
 
 	RenderEntry struct {
-		Kind  RenderCommand
-		Rect  Rectangle
-		Clr   Color
-		Img   Image
-		Const Constraint
-		Text  string
+		Kind   RenderCommand
+		Rect   Rectangle
+		Clr    Color
+		Img    Image
+		Constr Constraint
+		Text   string
 	}
 
 	RenderBuffer struct {
@@ -106,4 +108,10 @@ func newRenderBuffer(cap int) RenderBuffer {
 func (r *RenderBuffer) addEntry(e RenderEntry) {
 	r.data[r.count] = e
 	r.count += 1
+}
+
+func (r *RenderBuffer) flushBuffer() []RenderEntry {
+	result := r.data[:r.count]
+	r.count = 0
+	return result
 }
