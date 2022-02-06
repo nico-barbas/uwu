@@ -11,6 +11,10 @@ func (l *Layout) init() {
 	l.widgets.initList(l.Style)
 }
 
+func (l *Layout) update() {
+	l.widgets.updateWidgets()
+}
+
 func (l *Layout) draw(buf *renderBuffer) {
 	bgEntry := l.Background.entry(l.rect)
 	buf.addEntry(bgEntry)

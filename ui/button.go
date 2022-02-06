@@ -72,7 +72,7 @@ func (btn *Button) draw(buf *renderBuffer) {
 			Y:      btn.rect.Y + (btn.rect.Height/2 - textSize[1]/2),
 			Height: btn.TextSize,
 		},
-		Clr:  btn.Clr,
+		Clr:  btn.TextClr,
 		Font: btn.Font,
 		Text: btn.Text,
 	}

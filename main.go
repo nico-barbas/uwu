@@ -124,18 +124,21 @@ func main() {
 		Size: 12,
 	}, 20)
 
-	ui.AddWidget(lyt, &ui.Label{
+	ui.AddWidget(lyt, &ui.Button{
 		Background: ui.Background{
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
-			Clr:     ui.Color{255, 255, 255, 255},
 			Img:     &uiPatch,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
-		Font: &uiFont,
-		Text: "!",
-		Clr:  ui.Color{0, 0, 0, 255},
-		Size: 12,
+		Clr:          ui.Color{255, 255, 255, 255},
+		HighlightClr: ui.Color{255, 0, 255, 255},
+		PressedClr:   ui.Color{255, 255, 0, 255},
+		HasText:      true,
+		Font:         &uiFont,
+		Text:         "!",
+		TextClr:      ui.Color{0, 0, 0, 255},
+		TextSize:     12,
 	}, 20)
 
 	ui.AddWidget(hdl, &ui.Label{
@@ -153,6 +156,10 @@ func main() {
 	}, ui.FitContainer)
 
 	for !rl.WindowShouldClose() {
+		mpos := rl.GetMousePosition()
+		mleft := rl.IsMouseButtonDown(rl.MouseLeftButton)
+		ctx.UpdateUI(ui.Point{float64(mpos.X), float64(mpos.Y)}, mleft)
+
 		rl.BeginDrawing()
 
 		rl.ClearBackground(rl.Black)

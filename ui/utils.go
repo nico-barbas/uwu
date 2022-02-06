@@ -1,5 +1,7 @@
 package ui
 
+import "sync/atomic"
+
 type Handle struct {
 	node Node
 	id   int
@@ -68,7 +70,7 @@ type (
 )
 
 func (r Rectangle) pointInBounds(p Point) bool {
-	return (p[0] >= r.X && p[0] <= r.Y+r.Width) && (p[1] >= r.Y && p[1] <= r.Y+r.Height)
+	return (p[0] >= r.X && p[0] <= r.X+r.Width) && (p[1] >= r.Y && p[1] <= r.Y+r.Height)
 }
 
 const FitContainer = -1
@@ -165,12 +167,16 @@ func (r *renderBuffer) flushBuffer() []RenderEntry {
 // Input types and utility
 //
 
+const keyPressedCap = 50
+
 type (
 	inputData struct {
-		mPos          Point
-		mLeft         bool
-		previousmPos  Point
-		previousmLeft bool
+		mPos             Point
+		mLeft            bool
+		previousmPos     Point
+		previousmLeft    bool
+		pressedKeys      [keyPressedCap]int
+		pressedKeysCount int32
 	}
 )
 
@@ -195,4 +201,10 @@ func isMouseJustPressed() bool {
 
 func isMouseJustReleased() bool {
 	return !ctx.input.mLeft && (ctx.input.mLeft != ctx.input.previousmLeft)
+}
+
+// FIXME: Make this thread-safe
+func AppendKeyPressed(key int) {
+	index := atomic.AddInt32(&ctx.input.pressedKeysCount, 1)
+	ctx.input.pressedKeys[index] = key
 }

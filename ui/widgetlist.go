@@ -54,6 +54,12 @@ func (w *WidgetList) addWidget(parent Node, pRect Rectangle, wgt Widget, l int) 
 	return handle
 }
 
+func (w *WidgetList) updateWidgets() {
+	for i := 0; i < w.count; i += 1 {
+		w.widgets[i].update()
+	}
+}
+
 func (w *WidgetList) drawWidgets(buf *renderBuffer) {
 	for i := 0; i < w.count; i += 1 {
 		w.widgets[i].draw(buf)

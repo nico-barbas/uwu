@@ -133,6 +133,14 @@ func (c *Context) freeAllWindows() {
 	c.count = 0
 }
 
+func (c *Context) UpdateUI(mPos Point, mLeft bool) {
+	c.input.updateInput(mPos, mLeft)
+	for i := 0; i < ctx.count; i += 1 {
+		c.actives[i].update()
+	}
+	c.input.pressedKeysCount = 0
+}
+
 func (c *Context) DrawUI() []RenderEntry {
 	for i := 0; i < ctx.count; i += 1 {
 		c.actives[i].draw(&c.renderBuf)

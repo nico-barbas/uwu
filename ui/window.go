@@ -57,6 +57,10 @@ func (win *Window) initWindow() {
 	win.widgets.initList(win.Style)
 }
 
+func (win *Window) update() {
+	win.widgets.updateWidgets()
+}
+
 func (win *Window) draw(buf *renderBuffer) {
 	bgEntry := win.Background.entry(win.Rect)
 	buf.addEntry(bgEntry)
