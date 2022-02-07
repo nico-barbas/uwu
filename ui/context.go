@@ -135,8 +135,30 @@ func (c *Context) freeAllWindows() {
 	c.count = 0
 }
 
-func (c *Context) UpdateUI(mPos Point, mLeft bool) {
-	c.input.updateInput(mPos, mLeft)
+func (c *Context) UpdateUI(data Input) {
+	// Update all the input supplied
+	{
+		c.input.previousmPos = c.input.mPos
+		c.input.previousmLeft = c.input.mLeft
+		c.input.mPos = data.MPos
+		c.input.mLeft = data.MLeft
+		c.input.previousKeys = c.input.keys
+		c.input.keys[keyEsc] = data.Esc
+		c.input.keys[keyEnter] = data.Enter
+		c.input.keys[keyDelete] = data.Del
+		c.input.keys[keyCtlr] = data.Ctrl
+		c.input.keys[keyShift] = data.Shift
+		c.input.keys[keySpace] = data.Space
+
+		for i := range c.input.keyCounts {
+			if c.input.keys[i] {
+				c.input.keyCounts[i] += 1
+			}
+			if !c.input.keys[i] && c.input.previousKeys[i] {
+				c.input.keyCounts[i] = 0
+			}
+		}
+	}
 	for i := 0; i < ctx.count; i += 1 {
 		c.actives[i].update()
 	}

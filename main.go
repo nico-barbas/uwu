@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"log"
 
@@ -141,7 +142,7 @@ func main() {
 		TextSize:     12,
 	}, 20)
 
-	ui.AddWidget(hdl, &ui.Label{
+	ui.AddWidget(hdl, &ui.TextBox{
 		Background: ui.Background{
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
@@ -149,21 +150,27 @@ func main() {
 			Img:     &uiPatch,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
-		Font: &uiFont,
-		Text: "CANVAS GOES HERE!!",
-		Clr:  ui.Color{0, 0, 0, 255},
-		Size: 24,
+		Cap:      500,
+		Font:     &uiFont,
+		TextClr:  ui.Color{0, 0, 0, 255},
+		TextSize: 24,
 	}, ui.FitContainer)
 
 	for !rl.WindowShouldClose() {
 		key := rl.GetCharPressed()
 		for key > 0 {
-			ui.AppendKeyPressed(rune(key))
+			fmt.Println(key)
+			ctx.AppendCharPressed(key)
 			key = rl.GetCharPressed()
 		}
 		mpos := rl.GetMousePosition()
 		mleft := rl.IsMouseButtonDown(rl.MouseLeftButton)
-		ctx.UpdateUI(ui.Point{float64(mpos.X), float64(mpos.Y)}, mleft)
+		ctx.UpdateUI(ui.Input{
+			MPos:  ui.Point{float64(mpos.X), float64(mpos.Y)},
+			MLeft: mleft,
+			Enter: rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter),
+			Del:   rl.IsKeyDown(rl.KeyBackspace),
+		})
 
 		rl.BeginDrawing()
 

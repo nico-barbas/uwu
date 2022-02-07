@@ -68,12 +68,6 @@ func (win *Window) draw(buf *renderBuffer) {
 		hdrEntry := win.HeaderBackground.entry(win.headerRect)
 		buf.addEntry(hdrEntry)
 		if win.HasCloseBtn {
-			// btnEntry := RenderEntry{
-			// 	Kind: RenderImage,
-			// 	Rect: win.closeBtnRect,
-			// 	Clr:  Color{255, 255, 255, 255},
-			// 	Img:  win.CloseBtnImg,
-			// }
 			btnEntry := win.CloseBtn.entry(win.closeBtnRect)
 			buf.addEntry(btnEntry)
 		}

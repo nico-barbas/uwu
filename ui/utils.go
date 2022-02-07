@@ -169,6 +169,18 @@ func (r *renderBuffer) flushBuffer() []RenderEntry {
 
 const charPressedCap = 50
 
+type key int
+
+const (
+	keyEsc key = iota
+	keyEnter
+	keyDelete
+	keyCtlr
+	keyShift
+	keySpace
+	keyMax
+)
+
 type (
 	inputData struct {
 		mPos              Point
@@ -177,15 +189,25 @@ type (
 		previousmLeft     bool
 		pressedChars      [charPressedCap]rune
 		pressedCharsCount int32
+
+		previousKeys [keyMax]bool
+		keys         [keyMax]bool
+		keyCounts    [keyMax]int
+	}
+
+	Input struct {
+		MPos  Point
+		MLeft bool
+
+		// all the mods and keys the UI cares about
+		Esc   bool
+		Enter bool
+		Del   bool
+		Ctrl  bool
+		Shift bool
+		Space bool
 	}
 )
-
-func (i *inputData) updateInput(mpos Point, mleft bool) {
-	i.previousmPos = i.mPos
-	i.previousmLeft = i.mLeft
-	i.mPos = mpos
-	i.mLeft = mleft
-}
 
 func mousePosition() Point {
 	return ctx.input.mPos
@@ -203,12 +225,31 @@ func isMouseJustReleased() bool {
 	return !ctx.input.mLeft && (ctx.input.mLeft != ctx.input.previousmLeft)
 }
 
-func pressedKeys() []rune {
+func pressedChars() []rune {
 	return ctx.input.pressedChars[:ctx.input.pressedCharsCount]
 }
 
+// func isKeyPressed(k key) bool {
+// 	return ctx.input.keys[k]
+// }
+
+func isKeyRepeated(k key) bool {
+	const (
+		delay    = 30
+		interval = 3
+	)
+	d := ctx.input.keyCounts[k]
+	if d == 1 {
+		return true
+	}
+	if d >= delay && (d-delay)%interval == 0 {
+		return true
+	}
+	return false
+}
+
 // FIXME: Make this thread-safe
-func AppendKeyPressed(c rune) {
-	index := atomic.AddInt32(&ctx.input.pressedCharsCount, 1)
-	ctx.input.pressedChars[index] = c
+func (c *Context) AppendCharPressed(r rune) {
+	index := atomic.SwapInt32(&c.input.pressedCharsCount, c.input.pressedCharsCount+1)
+	c.input.pressedChars[index] = r
 }
