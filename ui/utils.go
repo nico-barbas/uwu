@@ -167,16 +167,16 @@ func (r *renderBuffer) flushBuffer() []RenderEntry {
 // Input types and utility
 //
 
-const keyPressedCap = 50
+const charPressedCap = 50
 
 type (
 	inputData struct {
-		mPos             Point
-		mLeft            bool
-		previousmPos     Point
-		previousmLeft    bool
-		pressedKeys      [keyPressedCap]int
-		pressedKeysCount int32
+		mPos              Point
+		mLeft             bool
+		previousmPos      Point
+		previousmLeft     bool
+		pressedChars      [charPressedCap]rune
+		pressedCharsCount int32
 	}
 )
 
@@ -203,8 +203,12 @@ func isMouseJustReleased() bool {
 	return !ctx.input.mLeft && (ctx.input.mLeft != ctx.input.previousmLeft)
 }
 
+func pressedKeys() []rune {
+	return ctx.input.pressedChars[:ctx.input.pressedCharsCount]
+}
+
 // FIXME: Make this thread-safe
-func AppendKeyPressed(key int) {
-	index := atomic.AddInt32(&ctx.input.pressedKeysCount, 1)
-	ctx.input.pressedKeys[index] = key
+func AppendKeyPressed(c rune) {
+	index := atomic.AddInt32(&ctx.input.pressedCharsCount, 1)
+	ctx.input.pressedChars[index] = c
 }

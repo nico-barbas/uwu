@@ -1,6 +1,8 @@
 package ui
 
-import "log"
+import (
+	"log"
+)
 
 // Capacity of each context.
 // Might be more flexible to take a capacity input
@@ -138,7 +140,8 @@ func (c *Context) UpdateUI(mPos Point, mLeft bool) {
 	for i := 0; i < ctx.count; i += 1 {
 		c.actives[i].update()
 	}
-	c.input.pressedKeysCount = 0
+	// fmt.Println(c.input.pressedChars[:c.input.pressedCharsCount])
+	c.input.pressedCharsCount = 0
 }
 
 func (c *Context) DrawUI() []RenderEntry {

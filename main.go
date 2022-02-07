@@ -156,6 +156,11 @@ func main() {
 	}, ui.FitContainer)
 
 	for !rl.WindowShouldClose() {
+		key := rl.GetCharPressed()
+		for key > 0 {
+			ui.AppendKeyPressed(rune(key))
+			key = rl.GetCharPressed()
+		}
 		mpos := rl.GetMousePosition()
 		mleft := rl.IsMouseButtonDown(rl.MouseLeftButton)
 		ctx.UpdateUI(ui.Point{float64(mpos.X), float64(mpos.Y)}, mleft)
