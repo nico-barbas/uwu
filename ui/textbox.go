@@ -159,8 +159,8 @@ func (t *TextBox) insertChar(r rune) {
 	t.charCount += 1
 	t.currentLine.end += 1
 	for i := t.currentLine.id + 1; i < t.lineCount; i += 1 {
-		t.lines[i+1].start += 1
-		t.lines[i+1].end += 1
+		t.lines[i].start += 1
+		t.lines[i].end += 1
 	}
 	t.cursor.X += t.Font.MeasureText(string(r), t.TextSize)[0]
 	t.caret += 1
@@ -258,7 +258,9 @@ func (t *TextBox) moveCursorH(dir cursorDir) {
 	case cursorLeft:
 		if t.caret-1 > 0 {
 			if t.caret-1 < t.currentLine.start {
-
+				t.lineIndex -= 1
+				t.currentLine = &t.lines[t.lineIndex]
+				t.moveCursorLineEnd()
 			} else if t.caret > 0 {
 				c := t.charBuf[t.caret-1]
 				t.cursor.X -= t.Font.MeasureText(string(c), t.TextSize)[0]
@@ -280,4 +282,5 @@ func (t *TextBox) moveCursorLineEnd() {
 		t.TextSize,
 	)
 	t.cursor.X = t.currentLine.origin[0] + lineSize[0]
+	t.cursor.Y = t.currentLine.origin[1]
 }

@@ -11,6 +11,10 @@ type Window struct {
 	Background Background
 	widgets    WidgetList
 
+	HasBorders  bool
+	BorderWidth float64
+	BorderColor Color
+
 	HasHeader        bool
 	HeaderHeight     float64
 	HeaderBackground Background
@@ -64,6 +68,41 @@ func (win *Window) update() {
 func (win *Window) draw(buf *renderBuffer) {
 	bgEntry := win.Background.entry(win.Rect)
 	buf.addEntry(bgEntry)
+	if win.HasBorders {
+		buf.addEntry(RenderEntry{
+			Kind: RenderRectangle,
+			Rect: Rectangle{
+				X: win.Rect.X, Y: win.Rect.Y,
+				Width: win.BorderWidth, Height: win.Rect.Height,
+			},
+			Clr: win.BorderColor,
+		})
+		buf.addEntry(RenderEntry{
+			Kind: RenderRectangle,
+			Rect: Rectangle{
+				X: win.Rect.X, Y: win.Rect.Y,
+				Width: win.Rect.Width, Height: win.BorderWidth,
+			},
+			Clr: win.BorderColor,
+		})
+		buf.addEntry(RenderEntry{
+			Kind: RenderRectangle,
+			Rect: Rectangle{
+				X: win.Rect.X + win.Rect.Width - win.BorderWidth, Y: win.Rect.Y,
+				Width: win.BorderWidth, Height: win.Rect.Height,
+			},
+			Clr: win.BorderColor,
+		})
+		buf.addEntry(RenderEntry{
+			Kind: RenderRectangle,
+			Rect: Rectangle{
+				X: win.Rect.X, Y: win.Rect.Y + win.Rect.Height - win.BorderWidth,
+				Width: win.Rect.Width, Height: win.BorderWidth,
+			},
+			Clr: win.BorderColor,
+		})
+	}
+
 	if win.HasHeader {
 		hdrEntry := win.HeaderBackground.entry(win.headerRect)
 		buf.addEntry(hdrEntry)

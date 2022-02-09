@@ -8,6 +8,10 @@ import (
 	"github.com/nico-ec/feelsgood/ui"
 )
 
+var (
+	uwuBackgroundColor = ui.Color{247, 231, 230, 255}
+)
+
 type Image struct {
 	rl.Texture2D
 }
@@ -32,11 +36,16 @@ func (f *Font) MeasureText(t string, size float64) ui.Point {
 func main() {
 	log.SetFlags(0)
 	log.SetFlags(log.Lshortfile)
-	rl.InitWindow(1600, 800, "Persephone")
+	rl.SetConfigFlags(rl.FlagWindowUndecorated)
+	rl.InitWindow(1600, 900, "UwU")
 	rl.SetTargetFPS(60)
 
-	uiPatch := Image{
-		Texture2D: rl.LoadTexture("assets/uiPatch.png"),
+	uiHeader := Image{
+		Texture2D: rl.LoadTexture("assets/uiHeader.png"),
+	}
+
+	uiLayout := Image{
+		Texture2D: rl.LoadTexture("assets/uiLayout.png"),
 	}
 	uiFont := Font{
 		Font: rl.LoadFontEx("assets/monogram.ttf", 32, nil, 250),
@@ -49,27 +58,27 @@ func main() {
 	hdl := ui.AddWindow(
 		ui.Window{
 			Active: true,
-			Rect:   ui.Rectangle{300, 100, 350, 200},
+			Rect:   ui.Rectangle{0, 0, 1600, 900},
 			Style: ui.Style{
 				Ordering: ui.StyleOrderColumn,
-				Padding:  3,
-				Margin:   ui.Point{3, 3},
+				Padding:  0,
+				Margin:   ui.Point{0, 0},
 			},
 			Background: ui.Background{
 				Visible: true,
-				Kind:    ui.BackgroundImageSlice,
-				Clr:     ui.Color{255, 255, 255, 255},
-				Img:     &uiPatch,
-				Constr:  ui.Constraint{2, 2, 2, 2},
+				Kind:    ui.BackgroundSolidColor,
+				Clr:     uwuBackgroundColor,
 			},
-
+			HasBorders:   true,
+			BorderWidth:  2,
+			BorderColor:  ui.Color{232, 152, 168, 255},
 			HasHeader:    true,
-			HeaderHeight: 18,
+			HeaderHeight: 25,
 			HeaderBackground: ui.Background{
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
-				Clr:     ui.Color{255, 142, 176, 255},
-				Img:     &uiPatch,
+				Clr:     ui.Color{232, 152, 168, 255},
+				Img:     &uiHeader,
 				Constr:  ui.Constraint{2, 2, 2, 2},
 			},
 			HasCloseBtn: true,
@@ -77,7 +86,7 @@ func main() {
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
 				Clr:     ui.Color{255, 255, 255, 255},
-				Img:     &uiPatch,
+				Img:     &uiHeader,
 				Constr:  ui.Constraint{2, 2, 2, 2},
 			},
 		},
@@ -86,8 +95,8 @@ func main() {
 		Background: ui.Background{
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
-			Clr:     ui.Color{198, 56, 34, 255},
-			Img:     &uiPatch,
+			Clr:     ui.Color{232, 152, 168, 255},
+			Img:     &uiLayout,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Style: ui.Style{
@@ -95,13 +104,13 @@ func main() {
 			Padding:  3,
 			Margin:   ui.Point{5, 5},
 		},
-	}, 40)
+	}, 80)
 	ui.AddWidget(lyt, &ui.Label{
 		Background: ui.Background{
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
 			Clr:     ui.Color{255, 255, 255, 255},
-			Img:     &uiPatch,
+			Img:     &uiHeader,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Font: &uiFont,
@@ -115,7 +124,7 @@ func main() {
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
 			Clr:     ui.Color{255, 255, 255, 255},
-			Img:     &uiPatch,
+			Img:     &uiHeader,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Font: &uiFont,
@@ -128,7 +137,7 @@ func main() {
 		Background: ui.Background{
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
-			Img:     &uiPatch,
+			Img:     &uiHeader,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Clr:          ui.Color{255, 255, 255, 255},
@@ -143,11 +152,11 @@ func main() {
 
 	ui.AddWidget(hdl, &ui.TextBox{
 		Background: ui.Background{
-			Visible: true,
-			Kind:    ui.BackgroundImageSlice,
-			Clr:     ui.Color{198, 56, 34, 255},
-			Img:     &uiPatch,
-			Constr:  ui.Constraint{2, 2, 2, 2},
+			Visible: false,
+			// Kind:    ui.BackgroundImageSlice,
+			// Clr:     ui.Color{232, 152, 168, 255},
+			// Img:     &uiHeader,
+			// Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Cap:      500,
 		Font:     &uiFont,
