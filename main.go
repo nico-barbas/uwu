@@ -47,6 +47,9 @@ func main() {
 	uiLayout := Image{
 		Texture2D: rl.LoadTexture("assets/uiLayout.png"),
 	}
+	uiBtn := Image{
+		Texture2D: rl.LoadTexture("assets/uiBtn.png"),
+	}
 	uiFont := Font{
 		Font: rl.LoadFontEx("assets/monogram.ttf", 32, nil, 250),
 	}
@@ -69,9 +72,9 @@ func main() {
 				Kind:    ui.BackgroundSolidColor,
 				Clr:     uwuBackgroundColor,
 			},
-			HasBorders:   true,
-			BorderWidth:  2,
-			BorderColor:  ui.Color{232, 152, 168, 255},
+			// HasBorders:   true,
+			// BorderWidth:  2,
+			// BorderColor:  ui.Color{232, 152, 168, 255},
 			HasHeader:    true,
 			HeaderHeight: 25,
 			HeaderBackground: ui.Background{
@@ -86,7 +89,7 @@ func main() {
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
 				Clr:     ui.Color{255, 255, 255, 255},
-				Img:     &uiHeader,
+				Img:     &uiBtn,
 				Constr:  ui.Constraint{2, 2, 2, 2},
 			},
 		},
@@ -110,7 +113,7 @@ func main() {
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
 			Clr:     ui.Color{255, 255, 255, 255},
-			Img:     &uiHeader,
+			Img:     &uiBtn,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Font: &uiFont,
@@ -124,7 +127,7 @@ func main() {
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
 			Clr:     ui.Color{255, 255, 255, 255},
-			Img:     &uiHeader,
+			Img:     &uiBtn,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Font: &uiFont,
@@ -137,7 +140,7 @@ func main() {
 		Background: ui.Background{
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
-			Img:     &uiHeader,
+			Img:     &uiBtn,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Clr:          ui.Color{255, 255, 255, 255},
