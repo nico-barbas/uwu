@@ -96,22 +96,21 @@ func (t *TextBox) update() {
 		// newTextSize := t.Font.MeasureText(string(keys), t.TextSize)
 		// t.cursor.X += newTextSize[0]
 	}
-	// if isKeyRepeated(keyDelete) {
-	// 	if t.charCount > 0 {
-	// 		t.charCount -= 1
-	// 		delChar := t.charBuf[t.charCount]
-	// 		switch delChar {
-	// 		case '\n':
-	// 			t.cursor.Y -= t.newlineSize
-	// 		default:
-	// 			delCharSize := t.Font.MeasureText(string(delChar), t.TextSize)
-	// 			t.cursor.X -= delCharSize[0]
-	// 		}
-	// 	}
-	// }
+	if isKeyRepeated(keyDelete) {
+		t.deleteChar()
+	}
 	if isKeyRepeated(keyEnter) {
 		t.insertChar('\n')
 		t.insertLine()
+	}
+
+	switch {
+	case isKeyRepeated(keyUp):
+	case isKeyRepeated(keyDown):
+	case isKeyRepeated(keyLeft):
+		t.moveCursorH(cursorLeft)
+	case isKeyRepeated(keyRight):
+		t.moveCursorH(cursorRight)
 	}
 	t.blinkTimer += 1
 	if t.blinkTimer == blinkTime {
@@ -158,13 +157,30 @@ func (t *TextBox) insertChar(r rune) {
 	copy(t.charBuf[t.caret+1:], t.charBuf[t.caret:t.charCount])
 	t.charBuf[t.caret] = r
 	t.charCount += 1
-	t.caret += 1
 	t.currentLine.end += 1
 	for i := t.currentLine.id + 1; i < t.lineCount; i += 1 {
 		t.lines[i+1].start += 1
 		t.lines[i+1].end += 1
 	}
-	t.moveCursorH(cursorLeft)
+	t.cursor.X += t.Font.MeasureText(string(r), t.TextSize)[0]
+	t.caret += 1
+}
+
+func (t *TextBox) deleteChar() {
+	if t.charCount > 0 && t.caret > 0 {
+		r := t.charBuf[t.caret-1]
+		if t.caret < t.charCount {
+			copy(t.charBuf[t.caret-1:], t.charBuf[t.caret:t.charCount])
+		}
+		t.charCount -= 1
+		t.currentLine.end -= 1
+		for i := t.currentLine.id + 1; i < t.lineCount; i += 1 {
+			t.lines[i+1].start -= 1
+			t.lines[i+1].end -= 1
+		}
+		t.cursor.X -= t.Font.MeasureText(string(r), t.TextSize)[0]
+		t.caret -= 1
+	}
 }
 
 func (t *TextBox) insertLine() {
@@ -192,8 +208,9 @@ func (t *TextBox) insertLine() {
 	}
 	t.currentLine = &t.lines[cur]
 	t.lineCount += 1
+	t.cursor.X = t.currentLine.origin[0]
+	t.cursor.Y = t.currentLine.origin[1]
 
-	t.moveCursorV(cursorDown)
 	// need to split if caret is in the middle of the line
 }
 
@@ -223,57 +240,30 @@ func (t *TextBox) moveCursorV(dir cursorDir) {
 			}
 			t.cursor.Y = t.currentLine.origin[1]
 		}
-		// case cursorLeft, cursorRight:
-		// 	if t.caret > 0 && t.caret < t.charCount {
-		// 		var c rune
-		// 		if dir == cursorLeft {
-		// 			c = t.charBuf[t.caret-1]
-		// 			t.caret -= 1
-		// 		} else {
-		// 			c = t.charBuf[t.caret-1]
-		// 			t.caret += 1
-		// 		}
-		// 		switch {
-		// 		case t.caret < t.currentLine.start:
-		// 			t.lineIndex -= 1
-		// 			t.currentLine = &t.lines[t.lineIndex]
-		// 			t.caret = t.currentLine.end
-		// 			lineSize := t.Font.MeasureText(
-		// 				string(t.charBuf[t.currentLine.start:t.currentLine.end]),
-		// 				t.TextSize,
-		// 			)
-		// 			t.cursor.X = t.currentLine.origin[0] + lineSize[0]
-		// 		case t.caret > t.currentLine.end:
-		// 			t.lineIndex += 1
-		// 		default:
-		// 			t.cursor.X += t.Font.MeasureText(string(c), t.TextSize)[0]
-		// 		}
-		// 	}
 	}
 }
 
 func (t *TextBox) moveCursorH(dir cursorDir) {
-	if t.caret >= 0 && t.caret <= t.charCount {
-		var c rune
-		if dir == cursorLeft {
-			c = t.charBuf[t.caret-1]
-		} else {
-			c = t.charBuf[t.caret-1]
+	switch dir {
+	case cursorRight:
+		if t.caret+1 <= t.charCount {
+			if t.caret+1 > t.currentLine.end {
+
+			} else {
+				c := t.charBuf[t.caret]
+				t.cursor.X += t.Font.MeasureText(string(c), t.TextSize)[0]
+				t.caret += 1
+			}
 		}
-		switch {
-		case t.caret < t.currentLine.start:
-			t.lineIndex -= 1
-			t.currentLine = &t.lines[t.lineIndex]
-			t.caret = t.currentLine.end
-			lineSize := t.Font.MeasureText(
-				string(t.charBuf[t.currentLine.start:t.currentLine.end]),
-				t.TextSize,
-			)
-			t.cursor.X = t.currentLine.origin[0] + lineSize[0]
-		case t.caret > t.currentLine.end:
-			t.lineIndex += 1
-		default:
-			t.cursor.X += t.Font.MeasureText(string(c), t.TextSize)[0]
+	case cursorLeft:
+		if t.caret-1 > 0 {
+			if t.caret-1 < t.currentLine.start {
+
+			} else if t.caret > 0 {
+				c := t.charBuf[t.caret-1]
+				t.cursor.X -= t.Font.MeasureText(string(c), t.TextSize)[0]
+				t.caret -= 1
+			}
 		}
 	}
 }

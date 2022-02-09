@@ -178,6 +178,10 @@ const (
 	keyCtlr
 	keyShift
 	keySpace
+	keyUp
+	keyDown
+	keyLeft
+	keyRight
 	keyMax
 )
 
@@ -206,6 +210,11 @@ type (
 		Ctrl  bool
 		Shift bool
 		Space bool
+
+		Up    bool
+		Down  bool
+		Left  bool
+		Right bool
 	}
 )
 

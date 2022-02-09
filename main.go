@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 
@@ -159,7 +158,6 @@ func main() {
 	for !rl.WindowShouldClose() {
 		key := rl.GetCharPressed()
 		for key > 0 {
-			fmt.Println(key)
 			ctx.AppendCharPressed(key)
 			key = rl.GetCharPressed()
 		}
@@ -170,6 +168,8 @@ func main() {
 			MLeft: mleft,
 			Enter: rl.IsKeyPressed(rl.KeyEnter) || rl.IsKeyPressed(rl.KeyKpEnter),
 			Del:   rl.IsKeyDown(rl.KeyBackspace),
+			Left:  rl.IsKeyDown(rl.KeyLeft),
+			Right: rl.IsKeyDown(rl.KeyRight),
 		})
 
 		rl.BeginDrawing()
