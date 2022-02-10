@@ -1,5 +1,7 @@
 package ui
 
+import "fmt"
+
 // Everything here is a little experimental and prototypish
 
 const (
@@ -55,7 +57,8 @@ type (
 	// NOTE: This level of granularity should be sufficient for now
 	// If not (i.e. needing text highlighting), can break up into words
 	line struct {
-		id int
+		id   int
+		text string
 		// A sub slice of the backing buffer
 		// with a record of the start and end in
 		// the editor's buffer
@@ -158,6 +161,7 @@ func (t *TextBox) draw(buf *renderBuffer) {
 		}
 		buf.addEntry(textEntry)
 		if t.HasRuler {
+
 			buf.addEntry(RenderEntry{
 				Kind: RenderText,
 				Rect: Rectangle{
@@ -165,10 +169,22 @@ func (t *TextBox) draw(buf *renderBuffer) {
 					Y:      t.rulerRect.Y + (t.TextSize+t.LinePadding)*float64(i),
 					Height: t.TextSize,
 				},
+				Clr:  t.TextClr,
+				Font: t.Font,
+				Text: fmt.Sprint(line.id),
 			})
 		}
 	}
-
+	buf.addEntry(RenderEntry{
+		Kind: RenderRectangle,
+		Rect: Rectangle{
+			X:      t.rulerRect.X + rulerWidth - 1,
+			Y:      t.rulerRect.Y,
+			Width:  1,
+			Height: t.activeRect.Height,
+		},
+		Clr: t.TextClr,
+	})
 	if t.showCursor {
 		buf.addEntry(RenderEntry{
 			Kind: RenderRectangle,
