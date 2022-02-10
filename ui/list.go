@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -14,37 +13,45 @@ type List struct {
 	widgetRoot
 
 	Background Background
+	Style      Style
 
+	activeRect Rectangle
 	Name       string
 	Font       Font
 	TextSize   float64
 	TextClr    Color
-	root       SubList
+	Root       SubList
 	IndentSize float64
 }
 
 func (l *List) init() {
-	l.root = newSubList(l.Name)
+	l.activeRect = Rectangle{
+		X:      l.rect.X + l.Style.Margin[0],
+		Y:      l.rect.Y + l.Style.Margin[1],
+		Width:  l.rect.Width - l.Style.Margin[0]*2,
+		Height: l.rect.Height - l.Style.Margin[1]*2,
+	}
+	l.Root = NewSubList(l.Name)
 }
 
 func (l *List) draw(buf *renderBuffer) {
 	bgEntry := l.Background.entry(l.rect)
 	buf.addEntry(bgEntry)
-	rootRect := Rectangle{
-		X:      l.rect.X,
-		Y:      l.rect.Y,
+	RootRect := Rectangle{
+		X:      l.activeRect.X,
+		Y:      l.activeRect.Y,
 		Height: l.TextSize,
 	}
-	l.root.draw(buf, l.Font, rootRect, l.TextClr, l.IndentSize)
+	l.Root.draw(buf, l.Font, RootRect, l.TextClr, l.IndentSize)
 }
 
 func (l *List) AddItem(i ListNode) {
-	l.root.addItem(i)
+	l.Root.AddItem(i)
 }
 
 type ListNode interface {
 	name() string
-	draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent float64)
+	draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent float64) float64
 }
 
 type (
@@ -58,14 +65,14 @@ type (
 	}
 )
 
-func newSubList(name string) SubList {
+func NewSubList(name string) SubList {
 	return SubList{
 		Name:  name,
 		items: make([]ListNode, 0, subListInitialCap),
 	}
 }
 
-func (s *SubList) addItem(i ListNode) {
+func (s *SubList) AddItem(i ListNode) {
 	name := i.name()
 	var exist bool
 	for _, item := range s.items {
@@ -85,8 +92,7 @@ func (s *SubList) name() string {
 	return s.Name
 }
 
-func (s *SubList) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent float64) {
-	fmt.Println("Start List")
+func (s *SubList) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent float64) float64 {
 	buf.addEntry(RenderEntry{
 		Kind: RenderText,
 		Rect: r,
@@ -94,23 +100,24 @@ func (s *SubList) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent
 		Font: f,
 		Text: s.Name,
 	})
-	i := 1
+	yPtr := r.Height + listLineSpacing
 	for _, item := range s.items {
 		childRect := Rectangle{
 			X:      r.X + indent,
-			Y:      r.Y + (r.Height+listLineSpacing)*float64(i),
+			Y:      r.Y + yPtr,
 			Height: r.Height,
 		}
-		item.draw(buf, f, childRect, clr, indent)
-		i += 1
+		h := item.draw(buf, f, childRect, clr, indent)
+		yPtr += h
 	}
+	return yPtr
 }
 
 func (l *ListItem) name() string {
 	return l.Name
 }
 
-func (l *ListItem) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent float64) {
+func (l *ListItem) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent float64) float64 {
 	buf.addEntry(RenderEntry{
 		Kind: RenderText,
 		Rect: r,
@@ -118,4 +125,5 @@ func (l *ListItem) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, inden
 		Font: f,
 		Text: l.Name,
 	})
+	return r.Height + listLineSpacing
 }

@@ -167,12 +167,10 @@ func main() {
 			Img:     &uiLayout,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
-		// 	Style: ui.Style{
-		// 		Ordering: ui.StyleOrderRow,
-		// 		Padding:  3,
-		// 		Margin:   ui.Point{5, 5},
-		// 	},
-		// }
+		Style: ui.Style{
+			Padding: 3,
+			Margin:  ui.Point{5, 0},
+		},
 
 		Name:       "Root",
 		Font:       &uiFont,
@@ -181,6 +179,11 @@ func main() {
 		IndentSize: 10,
 	}
 	ui.AddWidget(hdl, tree, 140)
+	subFolder := ui.NewSubList("subFolder")
+	tree.AddItem(&subFolder)
+	subFolder.AddItem(&ui.ListItem{Name: "file1"})
+	subFolder.AddItem(&ui.ListItem{Name: "file2"})
+	subFolder.AddItem(&ui.ListItem{Name: "file3"})
 	tree.AddItem(&ui.ListItem{Name: "file1"})
 	tree.AddItem(&ui.ListItem{Name: "file2"})
 	tree.AddItem(&ui.ListItem{Name: "file3"})
@@ -190,10 +193,6 @@ func main() {
 	ui.AddWidget(hdl, &ui.TextBox{
 		Background: ui.Background{
 			Visible: false,
-			// Kind:    ui.BackgroundImageSlice,
-			// Clr:     ui.Color{232, 152, 168, 255},
-			// Img:     &uiHeader,
-			// Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Cap:      500,
 		Margin:   10,
