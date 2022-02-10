@@ -6,6 +6,8 @@ const (
 	initialLineBufferSize = 50
 	textCursorWidth       = 2
 	blinkTime             = 45
+	rulerWidth            = 40
+	rulerAlpha            = 155
 )
 
 const (
@@ -41,6 +43,9 @@ type (
 		TextSize    float64
 		TextClr     Color
 
+		HasRuler  bool
+		rulerRect Rectangle
+
 		showCursor  bool
 		cursor      Rectangle
 		blinkTimer  int
@@ -72,6 +77,15 @@ func (t *TextBox) init() {
 		Y:      t.rect.Y + t.Margin,
 		Width:  t.rect.Width - t.Margin*2,
 		Height: t.rect.Height - t.Margin*2,
+	}
+	if t.HasRuler {
+		t.activeRect.X += t.Margin + rulerWidth
+		t.rulerRect = Rectangle{
+			X:      t.rect.X + t.Margin,
+			Y:      t.rect.Y + t.Margin,
+			Width:  rulerWidth,
+			Height: t.rect.Height - (t.Margin * 2),
+		}
 	}
 	t.lines[0] = line{
 		id:    0,
@@ -143,7 +157,18 @@ func (t *TextBox) draw(buf *renderBuffer) {
 			Text: text,
 		}
 		buf.addEntry(textEntry)
+		if t.HasRuler {
+			buf.addEntry(RenderEntry{
+				Kind: RenderText,
+				Rect: Rectangle{
+					X:      t.rulerRect.X,
+					Y:      t.rulerRect.Y + (t.TextSize+t.LinePadding)*float64(i),
+					Height: t.TextSize,
+				},
+			})
+		}
 	}
+
 	if t.showCursor {
 		buf.addEntry(RenderEntry{
 			Kind: RenderRectangle,

@@ -199,6 +199,7 @@ func main() {
 		Font:     &uiFont,
 		TextClr:  uwuTextClr,
 		TextSize: 12,
+		HasRuler: true,
 	}, ui.FitContainer)
 
 	for !rl.WindowShouldClose() {
