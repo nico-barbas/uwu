@@ -98,8 +98,6 @@ func (t *TextBox) update() {
 		for _, k := range keys {
 			t.insertChar(k)
 		}
-		// newTextSize := t.Font.MeasureText(string(keys), t.TextSize)
-		// t.cursor.X += newTextSize[0]
 	}
 	if isKeyRepeated(keyDelete) {
 		t.deleteChar()
@@ -131,9 +129,6 @@ func (t *TextBox) draw(buf *renderBuffer) {
 	for i := 0; i < t.lineCount; i += 1 {
 		line := &t.lines[i]
 		end := line.end
-		if t.charBuf[line.end] == '\n' {
-			end -= 1
-		}
 		text := string(t.charBuf[line.start:end])
 		textEntry := RenderEntry{
 			Kind: RenderText,
@@ -155,7 +150,6 @@ func (t *TextBox) draw(buf *renderBuffer) {
 			Clr:  t.TextClr,
 		})
 	}
-
 }
 
 func (t *TextBox) insertChar(r rune) {
@@ -177,20 +171,25 @@ func (t *TextBox) deleteChar() {
 		if t.caret < t.charCount {
 			copy(t.charBuf[t.caret-1:], t.charBuf[t.caret:t.charCount])
 		}
-		t.charCount -= 1
-		t.currentLine.end -= 1
 		for i := t.currentLine.id + 1; i < t.lineCount; i += 1 {
 			t.lines[i+1].start -= 1
 			t.lines[i+1].end -= 1
 		}
-		t.cursor.X -= t.Font.MeasureText(string(r), t.TextSize)[0]
+		t.currentLine.end -= 1
 		t.caret -= 1
+		t.charCount -= 1
+		if t.currentLine.end < t.currentLine.start {
+			t.deleteLine()
+		} else {
+			t.cursor.X -= t.Font.MeasureText(string(r), t.TextSize)[0]
+		}
 	}
 }
 
 func (t *TextBox) insertLine() {
 	t.lineIndex += 1
 	cur := t.lineIndex
+	// FIXME: This is not correct. Can end up out of bounds
 	for i := cur; i < t.lineCount; i += 1 {
 		t.lines[i+1] = t.lines[i]
 		t.lines[i+1].id += 1
@@ -217,6 +216,21 @@ func (t *TextBox) insertLine() {
 	t.cursor.Y = t.currentLine.origin[1]
 
 	// need to split if caret is in the middle of the line
+}
+
+// Do we assume that the carret is on the deleted line?
+func (t *TextBox) deleteLine() {
+	// FIXME: This is not correct. Can end up out of bounds
+	for i := t.lineIndex; i < t.lineCount; i += 1 {
+		t.lines[i] = t.lines[i+1]
+		t.lines[i].id -= 1
+		t.lines[i].origin[1] -= t.TextSize + t.LinePadding
+	}
+	t.lineIndex -= 1
+	t.lineCount -= 1
+	t.currentLine = &t.lines[t.lineIndex]
+	t.currentLine.end -= 1
+	t.moveCursorLineEnd()
 }
 
 func (t *TextBox) moveCursorV(dir cursorDir) {

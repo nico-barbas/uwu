@@ -52,7 +52,7 @@ func main() {
 	// 	Texture2D: rl.LoadTexture("assets/uiBtn.png"),
 	// }
 	uiFont := Font{
-		Font: rl.LoadFontEx("assets/monogram.ttf", 32, nil, 250),
+		Font: rl.LoadFont("assets/monogram.fnt"),
 	}
 	rl.SetTextureFilter(uiFont.Font.Texture, rl.FilterPoint)
 
@@ -88,7 +88,7 @@ func main() {
 			HasHeaderTitle: true,
 			HeaderTitle:    "UwU",
 			HeaderFont:     &uiFont,
-			HeaderFontSize: 16,
+			HeaderFontSize: 12,
 			HeaderFontClr:  uwuTextClr,
 			// HasCloseBtn:    true,
 			// CloseBtn: ui.Background{
@@ -125,7 +125,7 @@ func main() {
 	// 	Font: &uiFont,
 	// 	Text: "Hello",
 	// 	Clr:  uwuTextClr,
-	// 	Size: 16,
+	// 	Size: 12,
 	// }, 20)
 
 	// ui.AddWidget(lyt, &ui.Label{
@@ -139,7 +139,7 @@ func main() {
 	// 	Font: &uiFont,
 	// 	Text: "World",
 	// 	Clr:  uwuTextClr,
-	// 	Size: 16,
+	// 	Size: 12,
 	// }, 20)
 
 	// ui.AddWidget(lyt, &ui.Button{
@@ -156,7 +156,7 @@ func main() {
 	// 	Font:         &uiFont,
 	// 	Text:         "!",
 	// 	TextClr:      uwuTextClr,
-	// 	TextSize:     16,
+	// 	TextSize:     12,
 	// }, 20)
 
 	tree := &ui.List{
@@ -174,7 +174,7 @@ func main() {
 
 		Name:       "Root",
 		Font:       &uiFont,
-		TextSize:   14,
+		TextSize:   12,
 		TextClr:    uwuTextClr,
 		IndentSize: 10,
 	}
@@ -198,7 +198,7 @@ func main() {
 		Margin:   10,
 		Font:     &uiFont,
 		TextClr:  uwuTextClr,
-		TextSize: 16,
+		TextSize: 12,
 	}, ui.FitContainer)
 
 	for !rl.WindowShouldClose() {

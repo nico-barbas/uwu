@@ -69,6 +69,18 @@ type (
 	}
 )
 
+func (c Color) RGBA() (r, g, b, a uint32) {
+	r = uint32(c[0])
+	r |= r << 8
+	g = uint32(c[1])
+	g |= g << 8
+	b = uint32(c[2])
+	b |= b << 8
+	a = uint32(c[3])
+	a |= a << 8
+	return
+}
+
 func (r Rectangle) pointInBounds(p Point) bool {
 	return (p[0] >= r.X && p[0] <= r.X+r.Width) && (p[1] >= r.Y && p[1] <= r.Y+r.Height)
 }

@@ -110,6 +110,16 @@ func (s *SubList) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent
 		h := item.draw(buf, f, childRect, clr, indent)
 		yPtr += h
 	}
+	buf.addEntry(RenderEntry{
+		Kind: RenderRectangle,
+		Rect: Rectangle{
+			X:      r.X,
+			Y:      r.Y + r.Height + listLineSpacing,
+			Width:  1,
+			Height: yPtr - r.Height + listLineSpacing,
+		},
+		Clr: clr,
+	})
 	return yPtr
 }
 
