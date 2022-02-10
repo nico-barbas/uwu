@@ -19,6 +19,12 @@ type Window struct {
 	HeaderHeight     float64
 	HeaderBackground Background
 	headerRect       Rectangle
+	HasHeaderTitle   bool
+	HeaderTitle      string
+	HeaderFont       Font
+	HeaderFontSize   float64
+	HeaderFontClr    Color
+	headerTitlePos   Point
 
 	HasCloseBtn  bool
 	CloseBtn     Background
@@ -30,7 +36,7 @@ func (win *Window) parent() Node {
 }
 
 func (win *Window) initWindow() {
-	if win.HasCloseBtn && !win.HasHeader {
+	if (win.HasCloseBtn || win.HasHeaderTitle) && !win.HasHeader {
 		// What is the best behavior here? Should the UI force a header on the window?
 		// Or should it disable the Close button?
 		log.SetPrefix("[UI Error]: ")
@@ -54,6 +60,13 @@ func (win *Window) initWindow() {
 		win.activeRect = Rectangle{
 			X: win.Rect.X, Y: win.Rect.Y + win.HeaderHeight,
 			Width: win.Rect.Width, Height: win.Rect.Height - win.HeaderHeight,
+		}
+		if win.HasHeaderTitle {
+			titleWidth := win.HeaderFont.MeasureText(win.HeaderTitle, win.HeaderFontSize)[0]
+			win.headerTitlePos = Point{
+				win.headerRect.X + (win.headerRect.Width/2 - titleWidth/2),
+				win.headerRect.Y + (win.headerRect.Height/2 - win.HeaderFontSize/2),
+			}
 		}
 	} else {
 		win.activeRect = win.Rect
@@ -106,6 +119,19 @@ func (win *Window) draw(buf *renderBuffer) {
 	if win.HasHeader {
 		hdrEntry := win.HeaderBackground.entry(win.headerRect)
 		buf.addEntry(hdrEntry)
+		if win.HasHeaderTitle {
+			buf.addEntry(RenderEntry{
+				Kind: RenderText,
+				Rect: Rectangle{
+					X:      win.headerTitlePos[0],
+					Y:      win.headerTitlePos[1],
+					Height: win.HeaderFontSize,
+				},
+				Clr:  win.HeaderFontClr,
+				Font: win.HeaderFont,
+				Text: win.HeaderTitle,
+			})
+		}
 		if win.HasCloseBtn {
 			btnEntry := win.CloseBtn.entry(win.closeBtnRect)
 			buf.addEntry(btnEntry)

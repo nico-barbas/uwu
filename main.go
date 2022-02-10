@@ -84,7 +84,12 @@ func main() {
 				Img:     &uiHeader,
 				Constr:  ui.Constraint{2, 2, 2, 2},
 			},
-			HasCloseBtn: true,
+			HasHeaderTitle: true,
+			HeaderTitle:    "UwU",
+			HeaderFont:     &uiFont,
+			HeaderFontSize: 16,
+			HeaderFontClr:  ui.Color{0, 0, 0, 255},
+			HasCloseBtn:    true,
 			CloseBtn: ui.Background{
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
@@ -119,7 +124,7 @@ func main() {
 		Font: &uiFont,
 		Text: "Hello",
 		Clr:  ui.Color{0, 0, 0, 255},
-		Size: 12,
+		Size: 16,
 	}, 20)
 
 	ui.AddWidget(lyt, &ui.Label{
@@ -133,7 +138,7 @@ func main() {
 		Font: &uiFont,
 		Text: "World",
 		Clr:  ui.Color{0, 0, 0, 255},
-		Size: 12,
+		Size: 16,
 	}, 20)
 
 	ui.AddWidget(lyt, &ui.Button{
@@ -150,7 +155,7 @@ func main() {
 		Font:         &uiFont,
 		Text:         "!",
 		TextClr:      ui.Color{0, 0, 0, 255},
-		TextSize:     12,
+		TextSize:     16,
 	}, 20)
 
 	ui.AddWidget(hdl, &ui.TextBox{
@@ -162,9 +167,10 @@ func main() {
 			// Constr:  ui.Constraint{2, 2, 2, 2},
 		},
 		Cap:      500,
+		Margin:   10,
 		Font:     &uiFont,
 		TextClr:  ui.Color{0, 0, 0, 255},
-		TextSize: 24,
+		TextSize: 16,
 	}, ui.FitContainer)
 
 	for !rl.WindowShouldClose() {

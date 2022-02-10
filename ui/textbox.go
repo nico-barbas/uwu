@@ -34,6 +34,7 @@ type (
 		lineIndex   int
 		currentLine *line
 
+		activeRect  Rectangle
 		Margin      float64
 		LinePadding float64
 		Font        Font
