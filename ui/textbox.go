@@ -103,7 +103,8 @@ func (t *TextBox) update() {
 		t.deleteChar()
 	}
 	if isKeyRepeated(keyEnter) {
-		t.insertChar('\n')
+		// t.insertChar('\n')
+		t.insertNewline()
 		t.insertLine()
 	}
 
@@ -186,6 +187,16 @@ func (t *TextBox) deleteChar() {
 	}
 }
 
+func (t *TextBox) insertNewline() {
+	copy(t.charBuf[t.caret+1:], t.charBuf[t.caret:t.charCount])
+	t.charBuf[t.caret] = '\n'
+	t.charCount += 1
+	for i := t.currentLine.id + 1; i < t.lineCount; i += 1 {
+		t.lines[i].start += 1
+		t.lines[i].end += 1
+	}
+}
+
 func (t *TextBox) insertLine() {
 	t.lineIndex += 1
 	cur := t.lineIndex
@@ -212,8 +223,7 @@ func (t *TextBox) insertLine() {
 	}
 	t.currentLine = &t.lines[cur]
 	t.lineCount += 1
-	t.cursor.X = t.currentLine.origin[0]
-	t.cursor.Y = t.currentLine.origin[1]
+	t.moveCursorLineStart()
 
 	// need to split if caret is in the middle of the line
 }
@@ -229,7 +239,7 @@ func (t *TextBox) deleteLine() {
 	t.lineIndex -= 1
 	t.lineCount -= 1
 	t.currentLine = &t.lines[t.lineIndex]
-	t.currentLine.end -= 1
+	// t.currentLine.end -= 1
 	t.moveCursorLineEnd()
 }
 
@@ -292,6 +302,7 @@ func (t *TextBox) moveCursorH(dir cursorDir) {
 func (t *TextBox) moveCursorLineStart() {
 	t.caret = t.currentLine.start
 	t.cursor.X = t.currentLine.origin[0]
+	t.cursor.Y = t.currentLine.origin[1]
 }
 
 func (t *TextBox) moveCursorLineEnd() {
