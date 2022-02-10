@@ -67,13 +67,19 @@ type (
 func (t *TextBox) init() {
 	t.charBuf = make([]rune, t.Cap)
 	t.lines = make([]line, initialLineBufferSize)
+	t.activeRect = Rectangle{
+		X:      t.rect.X + t.Margin,
+		Y:      t.rect.Y + t.Margin,
+		Width:  t.rect.Width - t.Margin*2,
+		Height: t.rect.Height - t.Margin*2,
+	}
 	t.lines[0] = line{
 		id:    0,
 		start: 0,
 		end:   0,
 		origin: Point{
-			t.rect.X,
-			t.rect.Y,
+			t.activeRect.X,
+			t.activeRect.Y,
 		},
 	}
 	t.lineIndex = 0
@@ -81,11 +87,9 @@ func (t *TextBox) init() {
 	t.lineCount += 1
 
 	t.cursor = Rectangle{
-		X: t.rect.X, Y: t.rect.Y,
+		X: t.activeRect.X, Y: t.activeRect.Y,
 		Width: textCursorWidth, Height: t.TextSize,
 	}
-	// nl := t.Font.MeasureText("\n", t.TextSize)
-	// t.newlineSize = nl[1] - t.TextSize
 }
 
 func (t *TextBox) update() {
