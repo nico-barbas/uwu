@@ -11,7 +11,7 @@ import (
 var (
 	uwuBackgroundClr = ui.Color{247, 231, 230, 255}
 	uwuTextClr       = ui.Color{255, 95, 131, 255}
-	uwuKeywordClr    = ui.Color{254, 191, 242, 255}
+	uwuKeywordClr    = ui.Color{200, 106, 255, 255}
 	uwuDigitClr      = ui.Color{213, 133, 128, 255}
 )
 
@@ -50,9 +50,7 @@ func main() {
 	uiLayout := Image{
 		Texture2D: rl.LoadTexture("assets/uiLayout.png"),
 	}
-	// uiBtn := Image{
-	// 	Texture2D: rl.LoadTexture("assets/uiBtn.png"),
-	// }
+
 	uiFont := Font{
 		Font: rl.LoadFont("assets/monogram.fnt"),
 	}
@@ -228,6 +226,8 @@ func main() {
 			Del:   rl.IsKeyDown(rl.KeyBackspace),
 			Left:  rl.IsKeyDown(rl.KeyLeft),
 			Right: rl.IsKeyDown(rl.KeyRight),
+			Up:    rl.IsKeyDown(rl.KeyUp),
+			Down:  rl.IsKeyDown(rl.KeyDown),
 		})
 
 		rl.BeginDrawing()

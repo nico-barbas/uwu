@@ -143,7 +143,9 @@ func (t *TextBox) update() {
 
 	switch {
 	case isKeyRepeated(keyUp):
+		t.moveCursorV(cursorUp)
 	case isKeyRepeated(keyDown):
+		t.moveCursorV(cursorDown)
 	case isKeyRepeated(keyLeft):
 		t.moveCursorH(cursorLeft)
 	case isKeyRepeated(keyRight):
@@ -168,7 +170,7 @@ func (t *TextBox) draw(buf *renderBuffer) {
 			for j := 0; j < line.count; j += 1 {
 				var clr Color
 				token := line.tokens[j]
-				text := string(t.charBuf[token.start:token.end])
+				text := string(t.charBuf[line.start+token.start : line.start+token.end])
 				switch token.kind {
 				case tokenIdentifier:
 					clr = t.clrStyle.Normal
@@ -176,6 +178,8 @@ func (t *TextBox) draw(buf *renderBuffer) {
 					clr = t.clrStyle.Keyword
 				case tokenNumber:
 					clr = t.clrStyle.Digit
+				default:
+					clr = t.clrStyle.Normal
 				}
 				buf.addEntry(RenderEntry{
 					Kind: RenderText,
@@ -267,8 +271,8 @@ func (t *TextBox) deleteChar() {
 			copy(t.charBuf[t.caret-1:], t.charBuf[t.caret:t.charCount])
 		}
 		for i := t.currentLine.id + 1; i < t.lineCount; i += 1 {
-			t.lines[i+1].start -= 1
-			t.lines[i+1].end -= 1
+			t.lines[i].start -= 1
+			t.lines[i].end -= 1
 		}
 		t.currentLine.end -= 1
 		t.caret -= 1
@@ -351,7 +355,7 @@ func (t *TextBox) moveCursorV(dir cursorDir) {
 		if t.lineIndex > 0 {
 			col := t.caret - t.currentLine.start
 			t.lineIndex -= 1
-			t.currentLine = &t.lines[t.lineIndex-1]
+			t.currentLine = &t.lines[t.lineIndex]
 			if t.currentLine.start+col < t.currentLine.end {
 				t.caret = t.currentLine.start + col
 			} else {
@@ -363,7 +367,7 @@ func (t *TextBox) moveCursorV(dir cursorDir) {
 		if t.lineIndex <= t.lineCount {
 			col := t.caret - t.currentLine.start
 			t.lineIndex += 1
-			t.currentLine = &t.lines[t.lineIndex+1]
+			t.currentLine = &t.lines[t.lineIndex]
 			if t.currentLine.start+col < t.currentLine.end {
 				t.caret = t.currentLine.start + col
 			} else {
@@ -379,7 +383,9 @@ func (t *TextBox) moveCursorH(dir cursorDir) {
 	case cursorRight:
 		if t.caret+1 <= t.charCount {
 			if t.caret+1 > t.currentLine.end {
-
+				t.lineIndex += 1
+				t.currentLine = &t.lines[t.lineIndex]
+				t.moveCursorLineStart()
 			} else {
 				c := t.charBuf[t.caret]
 				t.cursor.X += t.Font.MeasureText(string(c), t.TextSize)[0]
@@ -387,7 +393,7 @@ func (t *TextBox) moveCursorH(dir cursorDir) {
 			}
 		}
 	case cursorLeft:
-		if t.caret-1 > 0 {
+		if t.caret-1 >= 0 {
 			if t.caret-1 < t.currentLine.start {
 				t.lineIndex -= 1
 				t.currentLine = &t.lines[t.lineIndex]
@@ -476,7 +482,7 @@ lex:
 			break lex
 		}
 		tok := token{
-			start: t.lexer.start + t.lexer.current,
+			start: t.lexer.current,
 		}
 		start := t.lexer.current
 		c := t.lexer.advance()
@@ -543,9 +549,9 @@ lex:
 			}
 		}
 
-		tok.end = t.lexer.start + t.lexer.current
+		tok.end = t.lexer.current
 		lexemeSize := t.Font.MeasureText(
-			string(t.charBuf[tok.start:tok.end]),
+			string(t.charBuf[l.start+tok.start:l.start+tok.end]),
 			t.TextSize,
 		)
 		tok.width = lexemeSize[0]
