@@ -1,4 +1,4 @@
-module github.com/nico-ec/feelsgood
+module github.com/nico-ec/uwu
 
 go 1.17
 

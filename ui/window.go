@@ -62,10 +62,10 @@ func (win *Window) initWindow() {
 			Width: win.Rect.Width, Height: win.Rect.Height - win.HeaderHeight,
 		}
 		if win.HasHeaderTitle {
-			titleWidth := win.HeaderFont.MeasureText(win.HeaderTitle, win.HeaderFontSize)[0]
+			titleSize := win.HeaderFont.MeasureText(win.HeaderTitle, win.HeaderFontSize)
 			win.headerTitlePos = Point{
-				win.headerRect.X + (win.headerRect.Width/2 - titleWidth/2),
-				win.headerRect.Y + (win.headerRect.Height/2 - win.HeaderFontSize/2),
+				win.headerRect.X + (win.headerRect.Width/2 - titleSize[0]/2),
+				win.headerRect.Y + (win.headerRect.Height/2 - titleSize[1]/2),
 			}
 		}
 	} else {
