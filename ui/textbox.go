@@ -13,10 +13,20 @@ const (
 )
 
 const (
-	cursorUp = iota
+	cursorUp cursorDir = iota
 	cursorDown
 	cursorLeft
 	cursorRight
+)
+
+const (
+	tokenNewline tokenKind = iota
+	tokenWhitespace
+	tokenKeyword
+	tokenIdentifier
+	tokenNumber
+	// Maybe need more granularity?
+	tokenSymbol // =+-/*%()
 )
 
 type (
@@ -54,8 +64,6 @@ type (
 		newlineSize float64
 	}
 
-	// NOTE: This level of granularity should be sufficient for now
-	// If not (i.e. needing text highlighting), can break up into words
 	line struct {
 		id   int
 		text string
@@ -65,8 +73,22 @@ type (
 		start int
 		end   int
 
+		current *token
+		tokens  []token
+		count   int
 		// For graphical display
 		origin Point
+	}
+
+	lexer struct{}
+
+	tokenKind uint8
+
+	token struct {
+		start int
+		end   int
+		width float64
+		kind  tokenKind
 	}
 
 	cursorDir uint8
@@ -92,6 +114,7 @@ func (t *TextBox) init() {
 	}
 	t.lines[0] = line{
 		id:    0,
+		text:  fmt.Sprint(1),
 		start: 0,
 		end:   0,
 		origin: Point{
@@ -169,22 +192,24 @@ func (t *TextBox) draw(buf *renderBuffer) {
 					Y:      t.rulerRect.Y + (t.TextSize+t.LinePadding)*float64(i),
 					Height: t.TextSize,
 				},
-				Clr:  t.TextClr,
+				Clr:  Color{t.TextClr[0], t.TextClr[1], t.TextClr[2], rulerAlpha},
 				Font: t.Font,
-				Text: fmt.Sprint(line.id),
+				Text: line.text,
 			})
 		}
 	}
-	buf.addEntry(RenderEntry{
-		Kind: RenderRectangle,
-		Rect: Rectangle{
-			X:      t.rulerRect.X + rulerWidth - 1,
-			Y:      t.rulerRect.Y,
-			Width:  1,
-			Height: t.activeRect.Height,
-		},
-		Clr: t.TextClr,
-	})
+	if t.HasRuler {
+		buf.addEntry(RenderEntry{
+			Kind: RenderRectangle,
+			Rect: Rectangle{
+				X:      t.rulerRect.X + rulerWidth - 1,
+				Y:      t.rulerRect.Y,
+				Width:  1,
+				Height: t.activeRect.Height,
+			},
+			Clr: Color{t.TextClr[0], t.TextClr[1], t.TextClr[2], rulerAlpha},
+		})
+	}
 	if t.showCursor {
 		buf.addEntry(RenderEntry{
 			Kind: RenderRectangle,
@@ -258,6 +283,7 @@ func (t *TextBox) insertLine() {
 	}
 	t.lines[cur] = line{
 		id:     cur,
+		text:   fmt.Sprint(cur + 1),
 		start:  t.charCount,
 		end:    t.charCount,
 		origin: o,
@@ -354,4 +380,54 @@ func (t *TextBox) moveCursorLineEnd() {
 	)
 	t.cursor.X = t.currentLine.origin[0] + lineSize[0]
 	t.cursor.Y = t.currentLine.origin[1]
+}
+
+func (t *TextBox) lexLine(l *line) {
+	for i := l.start; i < l.end; i += 1 {
+		tok := token{
+			start: i,
+			end:   i,
+			width: 0,
+		}
+		r := t.charBuf[i]
+		switch r {
+		case '\n':
+			tok.kind = tokenNewline
+		case ' ':
+			whitespaceW := t.Font.MeasureText(" ", t.TextSize)
+			peek := 1
+			for ; ; peek += 1 {
+				next := t.charBuf[i+peek]
+				if next != ' ' {
+					break
+				}
+			}
+			tok.kind = tokenWhitespace
+			tok.width = whitespaceW[0] * float64(peek)
+		default:
+			switch {
+			case isDigit(r):
+				for peek := 1; ; peek += 1 {
+				}
+			case isLetter(r):
+
+			default:
+				// still tag it as identifier for now
+			}
+		}
+		l.addToken(tok)
+	}
+}
+
+func (l *line) addToken(t token) {
+	l.tokens[l.count] = t
+	l.count += 1
+}
+
+func isDigit(r rune) bool {
+	return r >= '0' && r <= '9'
+}
+
+func isLetter(r rune) bool {
+	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
 }
