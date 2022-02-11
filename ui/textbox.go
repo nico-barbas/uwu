@@ -185,10 +185,11 @@ func (t *TextBox) draw(buf *renderBuffer) {
 		buf.addEntry(textEntry)
 		if t.HasRuler {
 
+			lnWidth := t.Font.MeasureText(line.text, t.TextSize)
 			buf.addEntry(RenderEntry{
 				Kind: RenderText,
 				Rect: Rectangle{
-					X:      t.rulerRect.X,
+					X:      t.rulerRect.X + t.rulerRect.Width - lnWidth[0] - t.Margin,
 					Y:      t.rulerRect.Y + (t.TextSize+t.LinePadding)*float64(i),
 					Height: t.TextSize,
 				},
