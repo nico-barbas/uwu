@@ -54,7 +54,7 @@ func main() {
 	uiFont := Font{
 		Font: rl.LoadFont("assets/monogram.fnt"),
 	}
-	rl.SetTextureFilter(uiFont.Font.Texture, rl.FilterPoint)
+	// rl.SetTextureFilter(uiFont.Font.Texture, rl.FilterPoint)
 
 	ctx := ui.NewContext()
 	ui.MakeContextCurrent(ctx)
@@ -64,7 +64,7 @@ func main() {
 			Active: true,
 			Rect:   ui.Rectangle{0, 0, 1600, 900},
 			Style: ui.Style{
-				Ordering: ui.StyleOrderColumn,
+				Ordering: ui.StyleOrderRow,
 				Padding:  0,
 				Margin:   ui.Point{0, 0},
 			},
@@ -73,9 +73,6 @@ func main() {
 				Kind:    ui.BackgroundSolidColor,
 				Clr:     uwuBackgroundClr,
 			},
-			// HasBorders:   true,
-			// BorderWidth:  2,
-			// BorderColor:  ui.Color{232, 152, 168, 255},
 			HasHeader:    true,
 			HeaderHeight: 25,
 			HeaderBackground: ui.Background{
@@ -100,65 +97,18 @@ func main() {
 			// },
 		},
 	)
-	// lyt := ui.AddWidget(hdl, &ui.Layout{
-	// 	Background: ui.Background{
-	// 		Visible: true,
-	// 		Kind:    ui.BackgroundImageSlice,
-	// 		Clr:     ui.Color{232, 152, 168, 255},
-	// 		Img:     &uiLayout,
-	// 		Constr:  ui.Constraint{2, 2, 2, 2},
-	// 	},
-	// 	Style: ui.Style{
-	// 		Ordering: ui.StyleOrderRow,
-	// 		Padding:  3,
-	// 		Margin:   ui.Point{5, 5},
-	// 	},
-	// }, 80)
-	// ui.AddWidget(lyt, &ui.Label{
-	// 	Background: ui.Background{
-	// 		Visible: true,
-	// 		Kind:    ui.BackgroundImageSlice,
-	// 		Clr:     ui.Color{255, 255, 255, 255},
-	// 		Img:     &uiBtn,
-	// 		Constr:  ui.Constraint{7, 7, 7, 7},
-	// 	},
-	// 	Font: &uiFont,
-	// 	Text: "Hello",
-	// 	Clr:  uwuTextClr,
-	// 	Size: 12,
-	// }, 20)
 
-	// ui.AddWidget(lyt, &ui.Label{
-	// 	Background: ui.Background{
-	// 		Visible: true,
-	// 		Kind:    ui.BackgroundImageSlice,
-	// 		Clr:     ui.Color{255, 255, 255, 255},
-	// 		Img:     &uiBtn,
-	// 		Constr:  ui.Constraint{7, 7, 7, 7},
-	// 	},
-	// 	Font: &uiFont,
-	// 	Text: "World",
-	// 	Clr:  uwuTextClr,
-	// 	Size: 12,
-	// }, 20)
-
-	// ui.AddWidget(lyt, &ui.Button{
-	// 	Background: ui.Background{
-	// 		Visible: true,
-	// 		Kind:    ui.BackgroundImageSlice,
-	// 		Img:     &uiBtn,
-	// 		Constr:  ui.Constraint{7, 7, 7, 7},
-	// 	},
-	// 	Clr:          ui.Color{255, 255, 255, 255},
-	// 	HighlightClr: ui.Color{255, 0, 255, 255},
-	// 	PressedClr:   ui.Color{255, 255, 0, 255},
-	// 	HasText:      true,
-	// 	Font:         &uiFont,
-	// 	Text:         "!",
-	// 	TextClr:      uwuTextClr,
-	// 	TextSize:     12,
-	// }, 20)
-
+	rem := ui.ContainerRemainingLength(hdl)
+	lyt := ui.AddWidget(hdl, &ui.Layout{
+		Background: ui.Background{
+			Visible: false,
+		},
+		Style: ui.Style{
+			Ordering: ui.StyleOrderColumn,
+			Padding:  0,
+			Margin:   ui.Point{0, 0},
+		},
+	}, rem-20)
 	tree := &ui.List{
 		Background: ui.Background{
 			Visible: true,
@@ -178,7 +128,7 @@ func main() {
 		TextClr:    uwuTextClr,
 		IndentSize: 10,
 	}
-	ui.AddWidget(hdl, tree, 140)
+	ui.AddWidget(lyt, tree, 140)
 	subFolder := ui.NewSubList("subFolder")
 	tree.AddItem(&subFolder)
 	subFolder.AddItem(&ui.ListItem{Name: "file1"})
@@ -209,7 +159,15 @@ func main() {
 		Keyword: uwuKeywordClr,
 		Digit:   uwuDigitClr,
 	})
-	ui.AddWidget(hdl, editor, ui.FitContainer)
+	ui.AddWidget(lyt, editor, ui.FitContainer)
+
+	// Status bar
+	ui.AddWidget(hdl, &ui.Layout{
+		Background: ui.Background{
+			Kind: ui.BackgroundSolidColor,
+			Clr:  uwuTextClr,
+		},
+	}, ui.FitContainer)
 
 	for !rl.WindowShouldClose() {
 		key := rl.GetCharPressed()

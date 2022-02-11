@@ -120,6 +120,20 @@ func AddWidget(parentHandle Handle, w Widget, len int) Handle {
 	return handle
 }
 
+func ContainerRemainingLength(hdl Handle) int {
+	result := -1
+	switch c := hdl.node.(type) {
+	case *Window:
+		result = c.widgets.getRemainingLen(c.activeRect)
+	case *Layout:
+		result = c.widgets.getRemainingLen(c.rect)
+	default:
+		log.SetPrefix("[UI Error]: ")
+		log.Println("Given UI Node is not a valid container")
+	}
+	return result
+}
+
 // Function used internally!
 // Reset the memory and all the handles
 func (c *Context) freeAllWindows() {

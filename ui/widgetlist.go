@@ -65,3 +65,13 @@ func (w *WidgetList) drawWidgets(buf *renderBuffer) {
 		w.widgets[i].draw(buf)
 	}
 }
+
+func (w *WidgetList) getRemainingLen(pRect Rectangle) int {
+	switch w.style.Ordering {
+	case StyleOrderRow:
+		return int(pRect.Height - w.ptr)
+	case StyleOrderColumn:
+		return int(pRect.Width - w.ptr)
+	}
+	return -1
+}
