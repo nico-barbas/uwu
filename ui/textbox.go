@@ -6,6 +6,7 @@ import "fmt"
 
 const (
 	initialLineBufferSize = 50
+	initialTokenCap       = 20
 	textCursorWidth       = 2
 	blinkTime             = 45
 	rulerWidth            = 40
@@ -17,16 +18,6 @@ const (
 	cursorDown
 	cursorLeft
 	cursorRight
-)
-
-const (
-	tokenNewline tokenKind = iota
-	tokenWhitespace
-	tokenKeyword
-	tokenIdentifier
-	tokenNumber
-	// Maybe need more granularity?
-	tokenSymbol // =+-/*%()
 )
 
 type (
@@ -62,6 +53,16 @@ type (
 		cursor      Rectangle
 		blinkTimer  int
 		newlineSize float64
+
+		HasSyntaxHighlight bool
+		lexer              lexer
+		clrStyle           ColorStyle
+	}
+
+	ColorStyle struct {
+		Normal  Color
+		Keyword Color
+		Digit   Color
 	}
 
 	line struct {
@@ -73,22 +74,10 @@ type (
 		start int
 		end   int
 
-		current *token
-		tokens  []token
-		count   int
+		tokens []token
+		count  int
 		// For graphical display
 		origin Point
-	}
-
-	lexer struct{}
-
-	tokenKind uint8
-
-	token struct {
-		start int
-		end   int
-		width float64
-		kind  tokenKind
 	}
 
 	cursorDir uint8
@@ -121,6 +110,10 @@ func (t *TextBox) init() {
 			t.activeRect.X,
 			t.activeRect.Y,
 		},
+	}
+	if t.HasSyntaxHighlight {
+		t.lines[0].tokens = make([]token, initialTokenCap)
+		t.TextClr = t.clrStyle.Normal
 	}
 	t.lineIndex = 0
 	t.currentLine = &t.lines[0]
@@ -169,20 +162,50 @@ func (t *TextBox) draw(buf *renderBuffer) {
 
 	for i := 0; i < t.lineCount; i += 1 {
 		line := &t.lines[i]
-		end := line.end
-		text := string(t.charBuf[line.start:end])
-		textEntry := RenderEntry{
-			Kind: RenderText,
-			Rect: Rectangle{
-				X:      line.origin[0],
-				Y:      line.origin[1],
-				Height: t.TextSize,
-			},
-			Clr:  t.TextClr,
-			Font: t.Font,
-			Text: text,
+		switch t.HasSyntaxHighlight {
+		case true:
+			var xptr float64 = 0
+			for j := 0; j < line.count; j += 1 {
+				var clr Color
+				token := line.tokens[j]
+				text := string(t.charBuf[token.start:token.end])
+				switch token.kind {
+				case tokenIdentifier:
+					clr = t.clrStyle.Normal
+				case tokenKeyword:
+					clr = t.clrStyle.Keyword
+				case tokenNumber:
+					clr = t.clrStyle.Digit
+				}
+				buf.addEntry(RenderEntry{
+					Kind: RenderText,
+					Rect: Rectangle{
+						X:      line.origin[0] + xptr,
+						Y:      line.origin[1],
+						Height: t.TextSize,
+					},
+					Clr:  clr,
+					Font: t.Font,
+					Text: text,
+				})
+				xptr += token.width
+			}
+		case false:
+			end := line.end
+			text := string(t.charBuf[line.start:end])
+			textEntry := RenderEntry{
+				Kind: RenderText,
+				Rect: Rectangle{
+					X:      line.origin[0],
+					Y:      line.origin[1],
+					Height: t.TextSize,
+				},
+				Clr:  t.TextClr,
+				Font: t.Font,
+				Text: text,
+			}
+			buf.addEntry(textEntry)
 		}
-		buf.addEntry(textEntry)
 		if t.HasRuler {
 
 			lnWidth := t.Font.MeasureText(line.text, t.TextSize)
@@ -231,6 +254,10 @@ func (t *TextBox) insertChar(r rune) {
 	}
 	t.cursor.X += t.Font.MeasureText(string(r), t.TextSize)[0]
 	t.caret += 1
+
+	if t.HasSyntaxHighlight {
+		t.lexLine(t.currentLine)
+	}
 }
 
 func (t *TextBox) deleteChar() {
@@ -251,6 +278,10 @@ func (t *TextBox) deleteChar() {
 		} else {
 			t.cursor.X -= t.Font.MeasureText(string(r), t.TextSize)[0]
 		}
+	}
+
+	if t.HasSyntaxHighlight {
+		t.lexLine(t.currentLine)
 	}
 }
 
@@ -288,6 +319,9 @@ func (t *TextBox) insertLine() {
 		start:  t.charCount,
 		end:    t.charCount,
 		origin: o,
+	}
+	if t.HasSyntaxHighlight {
+		t.lines[cur].tokens = make([]token, initialTokenCap)
 	}
 	t.currentLine = &t.lines[cur]
 	t.lineCount += 1
@@ -383,46 +417,176 @@ func (t *TextBox) moveCursorLineEnd() {
 	t.cursor.Y = t.currentLine.origin[1]
 }
 
+//
+// Lexing
+//
+
+const (
+	tokenNewline tokenKind = iota
+	tokenWhitespace
+	tokenKeyword
+	tokenIdentifier
+	tokenNumber
+	// Maybe need more granularity?
+	tokenSymbol // =+-/*%()
+)
+
+type (
+	lexer struct {
+		input    []rune
+		start    int
+		current  int
+		keywords []string
+	}
+
+	tokenKind uint8
+
+	token struct {
+		start int
+		end   int
+		width float64
+		kind  tokenKind
+	}
+)
+
+func (t *TextBox) SetLexKeywords(kw []string) {
+	t.lexer.keywords = kw
+}
+
+func (t *TextBox) SetSyntaxColors(style ColorStyle) {
+	t.clrStyle = style
+}
+
+func (t *TextBox) lexInit(start int, substr []rune) {
+	t.lexer.input = substr
+	t.lexer.start = start
+	t.lexer.current = 0
+}
+
 func (t *TextBox) lexLine(l *line) {
-	for i := l.start; i < l.end; i += 1 {
-		tok := token{
-			start: i,
-			end:   i,
-			width: 0,
+	l.emptyTokens()
+	t.lexInit(
+		l.start,
+		t.charBuf[l.start:l.end],
+	)
+
+lex:
+	for {
+		if t.lexer.eof() {
+			break lex
 		}
-		r := t.charBuf[i]
-		switch r {
+		tok := token{
+			start: t.lexer.start + t.lexer.current,
+		}
+		start := t.lexer.current
+		c := t.lexer.advance()
+		switch c {
 		case '\n':
 			tok.kind = tokenNewline
+
 		case ' ':
-			whitespaceW := t.Font.MeasureText(" ", t.TextSize)
-			peek := 1
-			for ; ; peek += 1 {
-				next := t.charBuf[i+peek]
+			wCount := 1
+			for {
+				if t.lexer.eof() {
+					break
+				}
+				next := t.lexer.peek()
 				if next != ' ' {
 					break
 				}
+				t.lexer.advance()
+				wCount += 1
 			}
 			tok.kind = tokenWhitespace
-			tok.width = whitespaceW[0] * float64(peek)
+
 		default:
 			switch {
-			case isDigit(r):
-				for peek := 1; ; peek += 1 {
+			case isDigit(c):
+				for {
+					if t.lexer.eof() {
+						break
+					}
+					next := t.lexer.peek()
+					hasDecimal := false
+					if !isDigit(next) {
+						if next == '.' && !hasDecimal {
+							hasDecimal = true
+						} else {
+							break
+						}
+					}
+					t.lexer.advance()
 				}
-			case isLetter(r):
+				tok.kind = tokenNumber
+
+			case isLetter(c):
+				for {
+					if t.lexer.eof() {
+						break
+					}
+					next := t.lexer.peek()
+					if !isLetter(next) {
+						break
+					}
+					t.lexer.advance()
+				}
+				word := t.lexer.input[start:t.lexer.current]
+				if t.lexer.isKeyword(string(word)) {
+					tok.kind = tokenKeyword
+				} else {
+					tok.kind = tokenIdentifier
+				}
 
 			default:
-				// still tag it as identifier for now
+				// This is the default branch for all the symbols for now
+				// may need more granularity
 			}
 		}
+
+		tok.end = t.lexer.start + t.lexer.current
+		lexemeSize := t.Font.MeasureText(
+			string(t.charBuf[tok.start:tok.end]),
+			t.TextSize,
+		)
+		tok.width = lexemeSize[0]
 		l.addToken(tok)
 	}
 }
 
 func (l *line) addToken(t token) {
+	if l.count > len(l.tokens) {
+		newbuf := make([]token, 0, len(l.tokens)*2)
+		copy(newbuf[:], l.tokens[:])
+		l.tokens = newbuf
+	}
 	l.tokens[l.count] = t
 	l.count += 1
+}
+
+func (l *line) emptyTokens() {
+	l.count = 0
+}
+
+func (l *lexer) advance() rune {
+	l.current += 1
+	return l.input[l.current-1]
+}
+
+func (l *lexer) peek() rune {
+	return l.input[l.current]
+}
+
+func (l *lexer) eof() bool {
+	return l.current >= len(l.input)
+}
+
+func (l *lexer) isKeyword(word string) bool {
+	for _, keyword := range l.keywords {
+		if string(word) == keyword {
+			return true
+		}
+	}
+	return false
 }
 
 func isDigit(r rune) bool {

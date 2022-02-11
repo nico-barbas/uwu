@@ -11,6 +11,8 @@ import (
 var (
 	uwuBackgroundClr = ui.Color{247, 231, 230, 255}
 	uwuTextClr       = ui.Color{255, 95, 131, 255}
+	uwuKeywordClr    = ui.Color{254, 191, 242, 255}
+	uwuDigitClr      = ui.Color{213, 133, 128, 255}
 )
 
 type Image struct {
@@ -190,17 +192,26 @@ func main() {
 	tree.AddItem(&ui.ListItem{Name: "file4"})
 	tree.AddItem(&ui.ListItem{Name: "file5"})
 
-	ui.AddWidget(hdl, &ui.TextBox{
+	editor := &ui.TextBox{
 		Background: ui.Background{
 			Visible: false,
 		},
-		Cap:      500,
-		Margin:   10,
-		Font:     &uiFont,
-		TextClr:  uwuTextClr,
-		TextSize: 12,
-		HasRuler: true,
-	}, ui.FitContainer)
+		Cap:                500,
+		Margin:             10,
+		Font:               &uiFont,
+		TextSize:           12,
+		HasRuler:           true,
+		HasSyntaxHighlight: true,
+	}
+	editor.SetLexKeywords([]string{
+		"func",
+	})
+	editor.SetSyntaxColors(ui.ColorStyle{
+		Normal:  uwuTextClr,
+		Keyword: uwuKeywordClr,
+		Digit:   uwuDigitClr,
+	})
+	ui.AddWidget(hdl, editor, ui.FitContainer)
 
 	for !rl.WindowShouldClose() {
 		key := rl.GetCharPressed()
