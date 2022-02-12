@@ -81,6 +81,31 @@ func (win *Window) update() {
 func (win *Window) draw(buf *renderBuffer) {
 	bgEntry := win.Background.entry(win.Rect)
 	buf.addEntry(bgEntry)
+
+	if win.HasHeader {
+		hdrEntry := win.HeaderBackground.entry(win.headerRect)
+		buf.addEntry(hdrEntry)
+		if win.HasHeaderTitle {
+			buf.addEntry(RenderEntry{
+				Kind: RenderText,
+				Rect: Rectangle{
+					X:      win.headerTitlePos[0],
+					Y:      win.headerTitlePos[1],
+					Height: win.HeaderFontSize,
+				},
+				Clr:  win.HeaderFontClr,
+				Font: win.HeaderFont,
+				Text: win.HeaderTitle,
+			})
+		}
+		if win.HasCloseBtn {
+			btnEntry := win.CloseBtn.entry(win.closeBtnRect)
+			buf.addEntry(btnEntry)
+		}
+	}
+
+	win.widgets.drawWidgets(buf)
+
 	if win.HasBorders {
 		buf.addEntry(RenderEntry{
 			Kind: RenderRectangle,
@@ -115,28 +140,4 @@ func (win *Window) draw(buf *renderBuffer) {
 			Clr: win.BorderColor,
 		})
 	}
-
-	if win.HasHeader {
-		hdrEntry := win.HeaderBackground.entry(win.headerRect)
-		buf.addEntry(hdrEntry)
-		if win.HasHeaderTitle {
-			buf.addEntry(RenderEntry{
-				Kind: RenderText,
-				Rect: Rectangle{
-					X:      win.headerTitlePos[0],
-					Y:      win.headerTitlePos[1],
-					Height: win.HeaderFontSize,
-				},
-				Clr:  win.HeaderFontClr,
-				Font: win.HeaderFont,
-				Text: win.HeaderTitle,
-			})
-		}
-		if win.HasCloseBtn {
-			btnEntry := win.CloseBtn.entry(win.closeBtnRect)
-			buf.addEntry(btnEntry)
-		}
-	}
-
-	win.widgets.drawWidgets(buf)
 }

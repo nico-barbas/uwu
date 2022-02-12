@@ -25,7 +25,7 @@ type (
 		widgetRoot
 
 		Background Background
-
+		focused    bool
 		// This should be a dynamic array
 		// in the off-chance that the edited text
 		// is incredibly long and its size can't be
@@ -126,35 +126,52 @@ func (t *TextBox) init() {
 }
 
 func (t *TextBox) update() {
-	keys := pressedChars()
-	if len(keys) > 0 {
-		for _, k := range keys {
-			t.insertChar(k)
+	mPos := mousePosition()
+	if isMouseJustPressed() {
+		if t.rect.pointInBounds(mPos) {
+			if !t.focused {
+				t.focused = true
+			}
+			// Set the cursor position to the closest character
+		} else {
+			t.focused = false
 		}
 	}
-	if isKeyRepeated(keyDelete) {
-		t.deleteChar()
-	}
-	if isKeyRepeated(keyEnter) {
-		// t.insertChar('\n')
-		t.insertNewline()
-		t.insertLine()
-	}
+	if t.focused {
+		keys := pressedChars()
+		if len(keys) > 0 {
+			for _, k := range keys {
+				t.insertChar(k)
+			}
+		}
+		if isKeyRepeated(keyDelete) {
+			if isKeyRepeated(keyCtlr) {
+				// delete word
+			} else {
+				t.deleteChar()
+			}
+		}
+		if isKeyRepeated(keyEnter) {
+			// t.insertChar('\n')
+			t.insertNewline()
+			t.insertLine()
+		}
 
-	switch {
-	case isKeyRepeated(keyUp):
-		t.moveCursorV(cursorUp)
-	case isKeyRepeated(keyDown):
-		t.moveCursorV(cursorDown)
-	case isKeyRepeated(keyLeft):
-		t.moveCursorH(cursorLeft)
-	case isKeyRepeated(keyRight):
-		t.moveCursorH(cursorRight)
-	}
-	t.blinkTimer += 1
-	if t.blinkTimer == blinkTime {
-		t.blinkTimer = 0
-		t.showCursor = !t.showCursor
+		switch {
+		case isKeyRepeated(keyUp):
+			t.moveCursorV(cursorUp)
+		case isKeyRepeated(keyDown):
+			t.moveCursorV(cursorDown)
+		case isKeyRepeated(keyLeft):
+			t.moveCursorH(cursorLeft)
+		case isKeyRepeated(keyRight):
+			t.moveCursorH(cursorRight)
+		}
+		t.blinkTimer += 1
+		if t.blinkTimer == blinkTime {
+			t.blinkTimer = 0
+			t.showCursor = !t.showCursor
+		}
 	}
 }
 
@@ -238,7 +255,7 @@ func (t *TextBox) draw(buf *renderBuffer) {
 			Clr: Color{t.TextClr[0], t.TextClr[1], t.TextClr[2], rulerAlpha},
 		})
 	}
-	if t.showCursor {
+	if t.showCursor && t.focused {
 		buf.addEntry(RenderEntry{
 			Kind: RenderRectangle,
 			Rect: t.cursor,
@@ -256,7 +273,7 @@ func (t *TextBox) insertChar(r rune) {
 		t.lines[i].start += 1
 		t.lines[i].end += 1
 	}
-	t.cursor.X += t.Font.MeasureText(string(r), t.TextSize)[0]
+	t.cursor.X += t.Font.GlyphAdvance(r, t.TextSize)
 	t.caret += 1
 
 	if t.HasSyntaxHighlight {
@@ -280,7 +297,7 @@ func (t *TextBox) deleteChar() {
 		if t.currentLine.end < t.currentLine.start {
 			t.deleteLine()
 		} else {
-			t.cursor.X -= t.Font.MeasureText(string(r), t.TextSize)[0]
+			t.cursor.X -= t.Font.GlyphAdvance(r, t.TextSize)
 		}
 	}
 
@@ -364,7 +381,7 @@ func (t *TextBox) moveCursorV(dir cursorDir) {
 			t.cursor.Y = t.currentLine.origin[1]
 		}
 	case cursorDown:
-		if t.lineIndex <= t.lineCount {
+		if t.lineIndex < t.lineCount-1 {
 			col := t.caret - t.currentLine.start
 			t.lineIndex += 1
 			t.currentLine = &t.lines[t.lineIndex]
@@ -388,7 +405,7 @@ func (t *TextBox) moveCursorH(dir cursorDir) {
 				t.moveCursorLineStart()
 			} else {
 				c := t.charBuf[t.caret]
-				t.cursor.X += t.Font.MeasureText(string(c), t.TextSize)[0]
+				t.cursor.X += t.Font.GlyphAdvance(c, t.TextSize)
 				t.caret += 1
 			}
 		}
@@ -400,7 +417,7 @@ func (t *TextBox) moveCursorH(dir cursorDir) {
 				t.moveCursorLineEnd()
 			} else if t.caret > 0 {
 				c := t.charBuf[t.caret-1]
-				t.cursor.X -= t.Font.MeasureText(string(c), t.TextSize)[0]
+				t.cursor.X -= t.Font.GlyphAdvance(c, t.TextSize)
 				t.caret -= 1
 			}
 		}
@@ -504,6 +521,7 @@ lex:
 				wCount += 1
 			}
 			tok.kind = tokenWhitespace
+			// tok.width = t.Font.GlyphAdvance(' ', t.TextSize) * float64(wCount)
 
 		default:
 			switch {
@@ -550,17 +568,16 @@ lex:
 		}
 
 		tok.end = t.lexer.current
-		lexemeSize := t.Font.MeasureText(
-			string(t.charBuf[l.start+tok.start:l.start+tok.end]),
-			t.TextSize,
-		)
-		tok.width = lexemeSize[0]
+		for i := tok.start; i < tok.end; i += 1 {
+			r := t.charBuf[l.start+i]
+			tok.width += t.Font.GlyphAdvance(r, t.TextSize)
+		}
 		l.addToken(tok)
 	}
 }
 
 func (l *line) addToken(t token) {
-	if l.count > len(l.tokens) {
+	if l.count >= len(l.tokens) {
 		newbuf := make([]token, 0, len(l.tokens)*2)
 		copy(newbuf[:], l.tokens[:])
 		l.tokens = newbuf

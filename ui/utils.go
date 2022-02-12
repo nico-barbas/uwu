@@ -18,6 +18,7 @@ type Node interface {
 // over the user native types for fonts and images
 type (
 	Font interface {
+		GlyphAdvance(r rune, size float64) float64
 		MeasureText(text string, size float64) Point
 	}
 

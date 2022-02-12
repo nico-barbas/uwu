@@ -6,6 +6,7 @@ import (
 	_ "image/png"
 	"os"
 
+	// rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -21,6 +22,13 @@ var (
 	uwuDigitClr      = ui.Color{213, 133, 128, 255}
 )
 
+func PixelsToPoints(pxSize int) float64 {
+	if pxSize < 1 {
+		panic("WTF")
+	}
+	return float64(pxSize) * (4.0 / 3.0)
+}
+
 func main() {
 	ebiten.SetWindowSize(1600, 900)
 	ebiten.SetWindowDecorated(false)
@@ -29,7 +37,8 @@ func main() {
 	uwu := new(uwu)
 	uwu.ui = ui.NewContext()
 	ui.MakeContextCurrent(uwu.ui)
-	uwu.font = NewFont("assets/CozetteVector.ttf", 72, []int{14})
+	uwu.font = NewFont("assets/CozetteVector.ttf", 72, []int{12})
+	fmt.Println(uwu.font.faces[12].GlyphAdvance(' '))
 
 	i, _, err := ebitenutil.NewImageFromFile("assets/uiHeader.png")
 	if err != nil {
@@ -72,7 +81,7 @@ func main() {
 			HasHeaderTitle: true,
 			HeaderTitle:    "UwU",
 			HeaderFont:     &uwu.font,
-			HeaderFontSize: 14,
+			HeaderFontSize: 12,
 			HeaderFontClr:  uwuTextClr,
 			// HasCloseBtn:    true,
 			// CloseBtn: ui.Background{
@@ -111,7 +120,7 @@ func main() {
 
 		Name:       "Root",
 		Font:       &uwu.font,
-		TextSize:   14,
+		TextSize:   12,
 		TextClr:    uwuTextClr,
 		IndentSize: 10,
 	}
@@ -135,7 +144,7 @@ func main() {
 		Cap:                500,
 		Margin:             10,
 		Font:               &uwu.font,
-		TextSize:           14,
+		TextSize:           12,
 		HasRuler:           true,
 		HasSyntaxHighlight: true,
 	}
@@ -206,6 +215,11 @@ func NewFont(path string, dpi float64, sizes []int) fnt {
 	return f
 }
 
+func (f *fnt) GlyphAdvance(r rune, size float64) float64 {
+	x, _ := f.faces[int(size)].GlyphAdvance(r)
+	return float64(x>>6) + float64(x&((1<<6)-1))/float64(1<<6)
+}
+
 func (f *fnt) MeasureText(t string, size float64) ui.Point {
 	measure := ui.Point{}
 
@@ -258,13 +272,13 @@ func (uwu *uwu) Draw(screen *ebiten.Image) {
 		switch e.Kind {
 		case ui.RenderText:
 			font := e.Font.(*fnt)
-			t := font.MeasureText(e.Text, e.Rect.Height)
+			// p := PixelsToPoints(int(e.Rect.Height))
 			text.Draw(
 				screen,
 				e.Text,
 				font.faces[int(e.Rect.Height)],
 				int(e.Rect.X),
-				int(e.Rect.Y+t[1]),
+				int(e.Rect.Y+e.Rect.Height),
 				e.Clr,
 			)
 		case ui.RenderRectangle:
@@ -414,7 +428,7 @@ func (uwu *uwu) Layout(w, h int) (int, int) {
 // 	}
 
 // 	uiFont := Font{
-// 		Font: rl.LoadFont("assets/monogram.fnt"),
+// 		Font: rl.LoadFont("assets/CozetteVector.ttf"),
 // 	}
 // 	// rl.SetTextureFilter(uiFont.Font.Texture, rl.FilterPoint)
 
@@ -514,7 +528,25 @@ func (uwu *uwu) Layout(w, h int) (int, int) {
 // 		HasSyntaxHighlight: true,
 // 	}
 // 	editor.SetLexKeywords([]string{
+// 		"type",
+// 		"struct",
+// 		"interface",
 // 		"func",
+// 		"go",
+// 		"return",
+// 		"bool",
+// 		"uint",
+// 		"uint8",
+// 		"uint16",
+// 		"uint32",
+// 		"uint64",
+// 		"int",
+// 		"int8",
+// 		"int16",
+// 		"int32",
+// 		"int64",
+// 		"float64",
+// 		"float32",
 // 	})
 // 	editor.SetSyntaxColors(ui.ColorStyle{
 // 		Normal:  uwuTextClr,
@@ -530,6 +562,61 @@ func (uwu *uwu) Layout(w, h int) (int, int) {
 // 			Clr:  uwuTextClr,
 // 		},
 // 	}, ui.FitContainer)
+
+// 	//
+// 	// Search window
+// 	//
+// 	cmdHdl := ui.AddWindow(ui.Window{
+// 		Active: true,
+// 		Rect:   ui.Rectangle{550, 380, 500, 40},
+// 		Style: ui.Style{
+// 			Ordering: ui.StyleOrderRow,
+// 			Padding:  0,
+// 			Margin:   ui.Point{0, 0},
+// 		},
+// 		Background: ui.Background{
+// 			Visible: true,
+// 			Kind:    ui.BackgroundSolidColor,
+// 			Clr:     uwuBackgroundClr,
+// 		},
+// 		HasHeader:    true,
+// 		HeaderHeight: 20,
+// 		HeaderBackground: ui.Background{
+// 			Visible: true,
+// 			Kind:    ui.BackgroundImageSlice,
+// 			Clr:     ui.Color{232, 152, 168, 255},
+// 			Img:     &uiHeader,
+// 			Constr:  ui.Constraint{2, 2, 2, 2},
+// 		},
+// 		HasHeaderTitle: true,
+// 		HeaderTitle:    "Command",
+// 		HeaderFont:     &uiFont,
+// 		HeaderFontSize: 12,
+// 		HeaderFontClr:  uwuTextClr,
+
+// 		HasBorders:  true,
+// 		BorderWidth: 1,
+// 		BorderColor: ui.Color{0, 0, 0, 255},
+// 		// HasCloseBtn:    true,
+// 		// CloseBtn: ui.Background{
+// 		// 	Visible: true,
+// 		// 	Kind:    ui.BackgroundImageSlice,
+// 		// 	Clr:     ui.Color{255, 255, 255, 255},
+// 		// 	Img:     &uiBtn,
+// 		// 	Constr:  ui.Constraint{2, 2, 2, 2},
+// 		// },
+// 	})
+// 	searchBar := &ui.TextBox{
+// 		Background: ui.Background{
+// 			Visible: false,
+// 		},
+// 		Cap:      500,
+// 		Margin:   3,
+// 		Font:     &uiFont,
+// 		TextSize: 12,
+// 		TextClr:  uwuTextClr,
+// 	}
+// 	ui.AddWidget(cmdHdl, searchBar, ui.FitContainer)
 
 // 	for !rl.WindowShouldClose() {
 // 		key := rl.GetCharPressed()
