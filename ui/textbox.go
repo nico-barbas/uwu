@@ -330,16 +330,14 @@ func (t *TextBox) insertLine() {
 	for i := t.lineIndex + 2; i < t.lineCount; i += 1 {
 		t.lines[i] = t.lines[i-1]
 		t.lines[i].id += 1
-		t.lines[i].text = fmt.Sprint(i)
-		// t.lines[i].start += 1
-		// t.lines[i].end += 1
+		t.lines[i].text = fmt.Sprint(i + 1)
 		t.lines[i].origin[1] += t.TextSize + t.LinePadding
 	}
 	t.lineIndex += 1
 	t.currentLine = &t.lines[t.lineIndex]
 	t.lines[t.lineIndex] = line{
 		id:    t.lineIndex,
-		text:  fmt.Sprint(t.lineIndex),
+		text:  fmt.Sprint(t.lineIndex + 1),
 		start: newlineStart,
 		end:   newlineEnd,
 		origin: Point{
@@ -524,7 +522,6 @@ lex:
 				wCount += 1
 			}
 			tok.kind = tokenWhitespace
-			// tok.width = t.Font.GlyphAdvance(' ', t.TextSize) * float64(wCount)
 
 		default:
 			switch {
