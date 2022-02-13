@@ -153,7 +153,7 @@ func (t *TextBox) update() {
 		}
 		if isKeyRepeated(keyEnter) {
 			// t.insertChar('\n')
-			t.insertNewline()
+			// t.insertNewline()
 			t.insertLine()
 		}
 
@@ -317,38 +317,41 @@ func (t *TextBox) insertNewline() {
 }
 
 func (t *TextBox) insertLine() {
+	t.insertNewline()
+	fmt.Println(t.charBuf[t.currentLine.start:t.currentLine.end])
+	newlineStart := t.caret + 1
+	newlineEnd := t.currentLine.end + 1
+	t.currentLine.end = t.caret
+	if t.HasSyntaxHighlight {
+		t.lexLine(t.currentLine)
+	}
+
+	t.lineCount += 1
+	for i := t.lineIndex + 2; i < t.lineCount; i += 1 {
+		t.lines[i] = t.lines[i-1]
+		t.lines[i].id += 1
+		t.lines[i].text = fmt.Sprint(i)
+		// t.lines[i].start += 1
+		// t.lines[i].end += 1
+		t.lines[i].origin[1] += t.TextSize + t.LinePadding
+	}
 	t.lineIndex += 1
-	cur := t.lineIndex
-	// FIXME: This is not correct. Can end up out of bounds
-	for i := cur; i < t.lineCount; i += 1 {
-		t.lines[i+1] = t.lines[i]
-		t.lines[i+1].id += 1
-		t.lines[i+1].start += 1
-		t.lines[i+1].end += 1
-		t.lines[i+1].origin[1] += t.TextSize + t.LinePadding
-	}
-	var o Point
-	if cur == t.lineCount {
-		o = t.lines[cur-1].origin
-		o[1] += t.TextSize + t.LinePadding
-	} else {
-		o = t.lines[cur].origin
-	}
-	t.lines[cur] = line{
-		id:     cur,
-		text:   fmt.Sprint(cur + 1),
-		start:  t.charCount,
-		end:    t.charCount,
-		origin: o,
+	t.currentLine = &t.lines[t.lineIndex]
+	t.lines[t.lineIndex] = line{
+		id:    t.lineIndex,
+		text:  fmt.Sprint(t.lineIndex),
+		start: newlineStart,
+		end:   newlineEnd,
+		origin: Point{
+			t.lines[t.lineIndex-1].origin[0],
+			t.lines[t.lineIndex-1].origin[1] + t.TextSize + t.LinePadding,
+		},
 	}
 	if t.HasSyntaxHighlight {
-		t.lines[cur].tokens = make([]token, initialTokenCap)
+		t.currentLine.tokens = make([]token, initialTokenCap)
+		t.lexLine(t.currentLine)
 	}
-	t.currentLine = &t.lines[cur]
-	t.lineCount += 1
 	t.moveCursorLineStart()
-
-	// need to split if caret is in the middle of the line
 }
 
 // Do we assume that the carret is on the deleted line?
