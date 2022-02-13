@@ -251,9 +251,9 @@ func pressedChars() []rune {
 	return ctx.input.pressedChars[:ctx.input.pressedCharsCount]
 }
 
-// func isKeyPressed(k key) bool {
-// 	return ctx.input.keys[k]
-// }
+func isKeyPressed(k key) bool {
+	return ctx.input.keys[k]
+}
 
 func isKeyRepeated(k key) bool {
 	const (

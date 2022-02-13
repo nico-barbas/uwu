@@ -41,6 +41,7 @@ func (ed *Editor) Update() error {
 		MLeft: mleft,
 		Enter: ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeyKPEnter),
 		Del:   ebiten.IsKeyPressed(ebiten.KeyBackspace),
+		Ctrl:  ebiten.IsKeyPressed(ebiten.KeyControlLeft) || ebiten.IsKeyPressed(ebiten.KeyControlRight),
 		Left:  ebiten.IsKeyPressed(ebiten.KeyLeft),
 		Right: ebiten.IsKeyPressed(ebiten.KeyRight),
 		Up:    ebiten.IsKeyPressed(ebiten.KeyUp),

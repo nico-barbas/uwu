@@ -149,16 +149,23 @@ func (t *TextBox) update() {
 			// t.insertNewline()
 			t.insertLine()
 		}
-
 		switch {
 		case isKeyRepeated(keyUp):
 			t.moveCursorUp()
 		case isKeyRepeated(keyDown):
 			t.moveCursorDown()
 		case isKeyRepeated(keyLeft):
-			t.moveCursorLeft()
+			if isKeyPressed(keyCtlr) {
+				t.moveCursorToPreviousWord()
+			} else {
+				t.moveCursorLeft()
+			}
 		case isKeyRepeated(keyRight):
-			t.moveCursorRight()
+			if isKeyPressed(keyCtlr) {
+				t.moveCursorToNextWord()
+			} else {
+				t.moveCursorRight()
+			}
 		}
 		t.blinkTimer += 1
 		if t.blinkTimer == blinkTime {
@@ -415,6 +422,42 @@ func (t *TextBox) moveCursorLeft() {
 	}
 }
 
+func (t *TextBox) moveCursorToNextWord() {
+	if t.caret+1 <= t.charCount {
+		c := t.charBuf[t.caret]
+		if isTerminalSymbol(c) {
+			t.cursor.X += t.Font.GlyphAdvance(c, t.TextSize)
+			t.caret += 1
+		}
+	}
+	for t.caret+1 <= t.charCount {
+		c := t.charBuf[t.caret]
+		if isTerminalSymbol(c) {
+			break
+		}
+		t.cursor.X += t.Font.GlyphAdvance(c, t.TextSize)
+		t.caret += 1
+	}
+}
+
+func (t *TextBox) moveCursorToPreviousWord() {
+	if t.caret-1 >= 0 {
+		c := t.charBuf[t.caret-1]
+		if isTerminalSymbol(c) {
+			t.cursor.X -= t.Font.GlyphAdvance(c, t.TextSize)
+			t.caret -= 1
+		}
+	}
+	for t.caret-1 >= 0 {
+		c := t.charBuf[t.caret-1]
+		if isTerminalSymbol(c) {
+			break
+		}
+		t.cursor.X -= t.Font.GlyphAdvance(c, t.TextSize)
+		t.caret -= 1
+	}
+}
+
 func (t *TextBox) moveCursorLineStart() {
 	t.caret = t.currentLine.start
 	t.cursor.X = t.currentLine.origin[0]
@@ -616,4 +659,8 @@ func isDigit(r rune) bool {
 
 func isLetter(r rune) bool {
 	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
+}
+
+func isTerminalSymbol(r rune) bool {
+	return r == ' ' || r == '.' || r == '/' || r == '{' || r == '[' || r == '('
 }
