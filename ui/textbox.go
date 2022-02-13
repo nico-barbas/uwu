@@ -13,13 +13,6 @@ const (
 	rulerAlpha            = 155
 )
 
-const (
-	cursorUp cursorDir = iota
-	cursorDown
-	cursorLeft
-	cursorRight
-)
-
 type (
 	TextBox struct {
 		widgetRoot
@@ -159,13 +152,13 @@ func (t *TextBox) update() {
 
 		switch {
 		case isKeyRepeated(keyUp):
-			t.moveCursorV(cursorUp)
+			t.moveCursorUp()
 		case isKeyRepeated(keyDown):
-			t.moveCursorV(cursorDown)
+			t.moveCursorDown()
 		case isKeyRepeated(keyLeft):
-			t.moveCursorH(cursorLeft)
+			t.moveCursorLeft()
 		case isKeyRepeated(keyRight):
-			t.moveCursorH(cursorRight)
+			t.moveCursorRight()
 		}
 		t.blinkTimer += 1
 		if t.blinkTimer == blinkTime {
@@ -366,60 +359,58 @@ func (t *TextBox) deleteLine() {
 	t.moveCursorLineEnd()
 }
 
-func (t *TextBox) moveCursorV(dir cursorDir) {
-	switch dir {
-	case cursorUp:
-		if t.lineIndex > 0 {
-			col := t.caret - t.currentLine.start
-			t.lineIndex -= 1
-			t.currentLine = &t.lines[t.lineIndex]
-			if t.currentLine.start+col < t.currentLine.end {
-				t.caret = t.currentLine.start + col
-			} else {
-				t.moveCursorLineEnd()
-			}
-			t.cursor.Y = t.currentLine.origin[1]
+func (t *TextBox) moveCursorUp() {
+	if t.lineIndex > 0 {
+		col := t.caret - t.currentLine.start
+		t.lineIndex -= 1
+		t.currentLine = &t.lines[t.lineIndex]
+		if t.currentLine.start+col < t.currentLine.end {
+			t.caret = t.currentLine.start + col
+		} else {
+			t.moveCursorLineEnd()
 		}
-	case cursorDown:
-		if t.lineIndex < t.lineCount-1 {
-			col := t.caret - t.currentLine.start
+		t.cursor.Y = t.currentLine.origin[1]
+	}
+}
+
+func (t *TextBox) moveCursorDown() {
+	if t.lineIndex < t.lineCount-1 {
+		col := t.caret - t.currentLine.start
+		t.lineIndex += 1
+		t.currentLine = &t.lines[t.lineIndex]
+		if t.currentLine.start+col < t.currentLine.end {
+			t.caret = t.currentLine.start + col
+		} else {
+			t.moveCursorLineEnd()
+		}
+		t.cursor.Y = t.currentLine.origin[1]
+	}
+}
+
+func (t *TextBox) moveCursorRight() {
+	if t.caret+1 <= t.charCount {
+		if t.caret+1 > t.currentLine.end {
 			t.lineIndex += 1
 			t.currentLine = &t.lines[t.lineIndex]
-			if t.currentLine.start+col < t.currentLine.end {
-				t.caret = t.currentLine.start + col
-			} else {
-				t.moveCursorLineEnd()
-			}
-			t.cursor.Y = t.currentLine.origin[1]
+			t.moveCursorLineStart()
+		} else {
+			c := t.charBuf[t.caret]
+			t.cursor.X += t.Font.GlyphAdvance(c, t.TextSize)
+			t.caret += 1
 		}
 	}
 }
 
-func (t *TextBox) moveCursorH(dir cursorDir) {
-	switch dir {
-	case cursorRight:
-		if t.caret+1 <= t.charCount {
-			if t.caret+1 > t.currentLine.end {
-				t.lineIndex += 1
-				t.currentLine = &t.lines[t.lineIndex]
-				t.moveCursorLineStart()
-			} else {
-				c := t.charBuf[t.caret]
-				t.cursor.X += t.Font.GlyphAdvance(c, t.TextSize)
-				t.caret += 1
-			}
-		}
-	case cursorLeft:
-		if t.caret-1 >= 0 {
-			if t.caret-1 < t.currentLine.start {
-				t.lineIndex -= 1
-				t.currentLine = &t.lines[t.lineIndex]
-				t.moveCursorLineEnd()
-			} else if t.caret > 0 {
-				c := t.charBuf[t.caret-1]
-				t.cursor.X -= t.Font.GlyphAdvance(c, t.TextSize)
-				t.caret -= 1
-			}
+func (t *TextBox) moveCursorLeft() {
+	if t.caret-1 >= 0 {
+		if t.caret-1 < t.currentLine.start {
+			t.lineIndex -= 1
+			t.currentLine = &t.lines[t.lineIndex]
+			t.moveCursorLineEnd()
+		} else if t.caret > 0 {
+			c := t.charBuf[t.caret-1]
+			t.cursor.X -= t.Font.GlyphAdvance(c, t.TextSize)
+			t.caret -= 1
 		}
 	}
 }
