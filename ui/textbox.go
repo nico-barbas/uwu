@@ -475,15 +475,17 @@ func (t *TextBox) moveCursorToMouse(mPos Point) {
 			// Search for the correct rune to position the cursor to
 			selectedLine := &t.lines[i]
 			currentXStartPos := selectedLine.origin[0]
+			currentXEndPos := currentXStartPos
 			t.moveCursorLineStart()
 			for j := selectedLine.start; j < selectedLine.end; j += 1 {
 				advance := t.Font.GlyphAdvance(t.charBuf[j], t.TextSize)
-				currentXEndPos := currentXStartPos + advance
-				t.caret = j
-				t.cursor.X += advance
+				currentXEndPos += advance
 				if mPos[0] >= currentXStartPos && mPos[0] <= currentXEndPos {
 					break
 				}
+				t.caret = j
+				t.cursor.X += advance
+				currentXStartPos = currentXEndPos
 			}
 			lineFound = true
 			break
