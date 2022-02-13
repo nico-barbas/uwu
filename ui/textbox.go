@@ -318,7 +318,6 @@ func (t *TextBox) insertNewline() {
 
 func (t *TextBox) insertLine() {
 	t.insertNewline()
-	fmt.Println(t.charBuf[t.currentLine.start:t.currentLine.end])
 	newlineStart := t.caret + 1
 	newlineEnd := t.currentLine.end + 1
 	t.currentLine.end = t.caret
@@ -439,6 +438,14 @@ func (t *TextBox) moveCursorLineEnd() {
 	)
 	t.cursor.X = t.currentLine.origin[0] + lineSize[0]
 	t.cursor.Y = t.currentLine.origin[1]
+}
+
+func (t *TextBox) CurrentLine() int {
+	return t.lineIndex + 1
+}
+
+func (t *TextBox) CurrentColumn() int {
+	return t.caret - t.currentLine.start
 }
 
 //

@@ -120,6 +120,20 @@ func AddWidget(parentHandle Handle, w Widget, len int) Handle {
 	return handle
 }
 
+// Super dodgy KEKL
+// No generation validation or use-after-free prevention
+func GetWidget(handle Handle) Widget {
+	var widget Widget
+	switch w := handle.node.(type) {
+	case *Window:
+		log.SetPrefix("[UI Error]: ")
+		log.Println("Given UI Handle does not point to a valid Widget")
+	case Widget:
+		widget = w
+	}
+	return widget
+}
+
 func ContainerRemainingLength(hdl Handle) int {
 	result := -1
 	switch c := hdl.node.(type) {

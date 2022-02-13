@@ -27,3 +27,7 @@ func (l *Label) draw(buf *renderBuffer) {
 	}
 	buf.addEntry(textEntry)
 }
+
+func (l *Label) SetText(text string) {
+	l.Text = text
+}
