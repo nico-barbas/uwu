@@ -120,12 +120,18 @@ func (t *TextBox) init() {
 
 func (t *TextBox) update() {
 	mPos := mousePosition()
+	inBoxBounds := t.activeRect.pointInBounds(mPos)
+	if inBoxBounds {
+		setCursorShape(CursorShapeText)
+	} else {
+		setCursorShape(CursorShapeDefault)
+	}
 	if isMouseJustPressed() {
-		if t.rect.pointInBounds(mPos) {
+		if inBoxBounds {
 			if !t.focused {
 				t.focused = true
 			}
-			// Set the cursor position to the closest character
+			t.moveCursorToMouse(mPos)
 		} else {
 			t.focused = false
 		}
@@ -458,6 +464,26 @@ func (t *TextBox) moveCursorToPreviousWord() {
 	}
 }
 
+func (t *TextBox) moveCursorToMouse(mPos Point) {
+	lineFound := false
+	for i := 0; i < t.lineCount; i += 1 {
+		lineYStartPos := t.lines[i].origin[1]
+		lineYEndPos := lineYStartPos + (t.TextSize + t.LinePadding)
+		if mPos[1] >= lineYStartPos && mPos[1] <= lineYEndPos {
+			t.lineIndex = i
+			t.currentLine = &t.lines[i]
+			t.moveCursorLineStart()
+			lineFound = true
+			break
+		}
+	}
+	if !lineFound {
+		t.lineIndex = t.lineCount - 1
+		t.currentLine = &t.lines[t.lineIndex]
+		t.moveCursorLineStart()
+	}
+}
+
 func (t *TextBox) moveCursorLineStart() {
 	t.caret = t.currentLine.start
 	t.cursor.X = t.currentLine.origin[0]
@@ -619,8 +645,8 @@ lex:
 
 func (l *line) addToken(t token) {
 	if l.count >= len(l.tokens) {
-		newbuf := make([]token, 0, len(l.tokens)*2)
-		copy(newbuf[:], l.tokens[:])
+		newbuf := make([]token, len(l.tokens)*2)
+		copy(newbuf[:], l.tokens[:len(l.tokens)])
 		l.tokens = newbuf
 	}
 	l.tokens[l.count] = t

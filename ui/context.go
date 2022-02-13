@@ -19,6 +19,8 @@ type Context struct {
 	actives   [ctxWindowCap]*Window
 	count     int
 	input     inputData
+
+	cursorShapeCallback func(s CursorShape)
 }
 
 // Internal data used for the window free list.
@@ -40,6 +42,10 @@ func NewContext() *Context {
 
 func MakeContextCurrent(c *Context) {
 	ctx = c
+}
+
+func (c *Context) SetCursorShapeCallback(cb func(CursorShape)) {
+	c.cursorShapeCallback = cb
 }
 
 // Add a window (a copy of the one given as argument)

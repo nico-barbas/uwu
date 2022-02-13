@@ -184,6 +184,7 @@ func (e *Editor) Layout(w, h int) (int, int) {
 func NewEditor() *Editor {
 	ed := new(Editor)
 	ed.ctx = ui.NewContext()
+	ed.ctx.SetCursorShapeCallback(changeEditorCursorShape)
 	ui.MakeContextCurrent(ed.ctx)
 	ed.font = NewFont("assets/CozetteVector.ttf", 72, []int{12})
 
@@ -311,4 +312,15 @@ func NewEditor() *Editor {
 	ed.statusbar = newStatusBar(ed.window, txtEdit, &ed.font)
 
 	return ed
+}
+
+func changeEditorCursorShape(s ui.CursorShape) {
+	var ebitenCursorShape ebiten.CursorShapeType
+	switch s {
+	case ui.CursorShapeDefault:
+		ebitenCursorShape = ebiten.CursorShapeDefault
+	case ui.CursorShapeText:
+		ebitenCursorShape = ebiten.CursorShapeText
+	}
+	ebiten.SetCursorShape(ebitenCursorShape)
 }

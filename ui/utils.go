@@ -1,6 +1,9 @@
 package ui
 
-import "sync/atomic"
+import (
+	"log"
+	"sync/atomic"
+)
 
 type Handle struct {
 	node Node
@@ -229,6 +232,13 @@ type (
 		Left  bool
 		Right bool
 	}
+
+	CursorShape int
+)
+
+const (
+	CursorShapeDefault CursorShape = iota
+	CursorShapeText
 )
 
 func mousePosition() Point {
@@ -268,6 +278,15 @@ func isKeyRepeated(k key) bool {
 		return true
 	}
 	return false
+}
+
+func setCursorShape(s CursorShape) {
+	if ctx.cursorShapeCallback != nil {
+		ctx.cursorShapeCallback(s)
+	} else {
+		log.SetPrefix("[UI Error]: ")
+		log.Fatalln("No Cursor shape callback was provided")
+	}
 }
 
 // FIXME: Make this thread-safe

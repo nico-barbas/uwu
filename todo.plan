@@ -3,9 +3,9 @@
   "LockProject": false,
   "BoardIndex": 0,
   "BoardCount": 1,
-  "AutoSave": false,
-  "Pan.X": -469.804443359375,
-  "Pan.Y": -220.890869140625,
+  "AutoSave": true,
+  "Pan.X": -400.804443359375,
+  "Pan.Y": -194.890869140625,
   "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
@@ -18,7 +18,7 @@
   "GridVisible": true,
   "GridSize": 16,
   "BackupInterval": 15,
-  "BackupKeepCount": 3,
+  "BackupKeepCount": 1,
   "UndoMaxSteps": 0,
   "AlwaysShowURLButtons": false,
   "IncompleteTasksGlow": false,
@@ -174,6 +174,18 @@
       "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 13 2022 19:08:50"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 272,
+      "Position.Y": 272,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Undo Redo function feature",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 13 2022 19:22:16"
     }
   ]
 }
