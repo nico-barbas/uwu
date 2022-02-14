@@ -45,10 +45,10 @@ type (
 		HasRuler  bool
 		rulerRect Rectangle
 
-		showCursor  bool
-		cursor      Rectangle
-		blinkTimer  int
-		newlineSize float64
+		showCursor      bool
+		cursor          Rectangle
+		blinkTimer      int
+		ShowCurrentLine bool
 
 		HasSyntaxHighlight bool
 		lexer              lexer
@@ -193,6 +193,19 @@ func (t *TextBox) update() {
 func (t *TextBox) draw(buf *renderBuffer) {
 	bgEntry := t.Background.entry(t.rect)
 	buf.addEntry(bgEntry)
+
+	if t.ShowCurrentLine {
+		buf.addEntry(RenderEntry{
+			Kind: RenderRectangle,
+			Rect: Rectangle{
+				X:      t.currentLine.origin[0],
+				Y:      t.currentLine.origin[1],
+				Width:  t.activeRect.Width,
+				Height: t.TextSize,
+			},
+			Clr: Color{t.TextClr[0], t.TextClr[1], t.TextClr[2], rulerAlpha},
+		})
+	}
 
 	for i := 0; i < t.lineCount; i += 1 {
 		line := &t.lines[i]

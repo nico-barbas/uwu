@@ -300,6 +300,7 @@ func NewEditor() *Editor {
 		AutoIndent:         true,
 		HasRuler:           true,
 		HasSyntaxHighlight: true,
+		ShowCurrentLine:    true,
 	}
 	editor.SetLexKeywords([]string{
 		"func",
