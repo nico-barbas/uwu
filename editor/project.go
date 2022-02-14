@@ -5,15 +5,22 @@ import (
 	"os"
 )
 
+var exceptionList = []string{
+	"./.git",
+	"./.vscode",
+}
+
 type (
 	project struct {
 		rootInfo os.FileInfo
-		root     folder
+		root     *folder
 		current  *folder
 		previous *folder
 	}
 
-	projectNode interface{}
+	projectNode interface {
+		name() string
+	}
 
 	folder struct {
 		entry fs.DirEntry
@@ -32,11 +39,17 @@ func openProject(path string) project {
 	if err != nil {
 		panic(err)
 	}
-	proj.root = folder{
+	proj.root = &folder{
 		nodes: make(map[string]projectNode),
 	}
-	proj.current = &proj.root
+	proj.current = proj.root
 
+	proj.readDir(path)
+
+	return proj
+}
+
+func (p *project) readDir(path string) {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		panic(err)
@@ -44,16 +57,30 @@ func openProject(path string) project {
 	for _, f := range files {
 		switch f.IsDir() {
 		case true:
+			dirName := f.Name()
+			dirPath := path
+			if path[len(path)-1] != '/' {
+				dirPath += "/"
+			}
+			dirPath += dirName
+			if !isPathException(dirPath) {
+				p.current.addSubFolder(f)
+				p.previous = p.current
+				p.current = p.current.nodes[dirName].(*folder)
+				p.readDir(dirPath)
+				p.current = p.previous
+			}
 		case false:
-			proj.current.addFile(f)
+			p.current.addFile(f)
 		}
 	}
-
-	return proj
 }
 
-func (f folder) readFolder(entry fs.DirEntry) {
-
+func (f *folder) addSubFolder(entry fs.DirEntry) {
+	f.nodes[entry.Name()] = &folder{
+		entry: entry,
+		nodes: make(map[string]projectNode),
+	}
 }
 
 func (f *folder) addFile(entry fs.DirEntry) {
@@ -62,4 +89,21 @@ func (f *folder) addFile(entry fs.DirEntry) {
 	f.nodes[entry.Name()] = file{
 		entry: entry,
 	}
+}
+
+func (f folder) name() string {
+	return f.entry.Name()
+}
+
+func (f file) name() string {
+	return f.entry.Name()
+}
+
+func isPathException(path string) bool {
+	for _, e := range exceptionList {
+		if e == path {
+			return true
+		}
+	}
+	return false
 }

@@ -83,7 +83,7 @@
       "BoardIndex": 0,
       "Position.X": 288,
       "Position.Y": 144,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Display tree view",
@@ -94,7 +94,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 288,
-      "Position.Y": 160,
+      "Position.Y": 176,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -106,7 +106,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 176,
+      "Position.Y": 192,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -118,7 +118,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 192,
+      "Position.Y": 208,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -130,7 +130,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 208,
+      "Position.Y": 224,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -142,7 +142,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 224,
+      "Position.Y": 240,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -154,7 +154,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 240,
+      "Position.Y": 256,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -166,7 +166,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 256,
+      "Position.Y": 272,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -178,7 +178,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 272,
+      "Position.Y": 288,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -190,7 +190,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 288,
+      "Position.Y": 304,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -202,7 +202,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 272,
-      "Position.Y": 304,
+      "Position.Y": 320,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -210,6 +210,18 @@
       "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 14 2022 01:54:25"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 288,
+      "Position.Y": 160,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Sort project files alphabetically",
+      "Selected": true,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 14 2022 17:07:57"
     }
   ]
 }

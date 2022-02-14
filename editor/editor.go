@@ -11,7 +11,8 @@ import (
 )
 
 type Editor struct {
-	ctx *ui.Context
+	ctx     *ui.Context
+	project project
 
 	// Editor's resources
 	font   Font
@@ -275,35 +276,19 @@ func NewEditor() *Editor {
 		IndentSize: 10,
 	}
 	ui.AddWidget(lyt, ed.treeView, 140)
-	// subFolder := ui.NewSubList("subFolder")
 	{
-		p := openProject("./")
-		for k := range p.root.nodes {
-			ed.treeView.AddItem(&ui.ListItem{Name: k})
+		ed.project = openProject("./")
+		for k, v := range ed.project.root.nodes {
+			switch f := v.(type) {
+			case *folder:
+				subList := ui.NewSubList(k)
+				populateSubList(&subList, f)
+				ed.treeView.AddItem(&subList)
+			case file:
+				ed.treeView.AddItem(&ui.ListItem{Name: k})
+			}
 		}
-		// files, err := os.ReadDir("./")
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// for _, f := range files {
-		// 	fmt.Println(f.Name())
-		// 	switch f.IsDir() {
-		// 	case true:
-		// 		ed.treeView.AddItem(&ui.SubList{Name: f.Name()})
-		// 	case false:
-		// 		ed.treeView.AddItem(&ui.ListItem{Name: f.Name()})
-		// 	}
-		// }
 	}
-	// ed.treeView.AddItem(&subFolder)
-	// subFolder.AddItem(&ui.ListItem{Name: "file1"})
-	// subFolder.AddItem(&ui.ListItem{Name: "file2"})
-	// subFolder.AddItem(&ui.ListItem{Name: "file3"})
-	// ed.treeView.AddItem(&ui.ListItem{Name: "file1"})
-	// ed.treeView.AddItem(&ui.ListItem{Name: "file2"})
-	// ed.treeView.AddItem(&ui.ListItem{Name: "file3"})
-	// ed.treeView.AddItem(&ui.ListItem{Name: "file4"})
-	// ed.treeView.AddItem(&ui.ListItem{Name: "file5"})
 
 	// Text editor
 	editor := &ui.TextBox{
