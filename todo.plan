@@ -4,8 +4,8 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -400.804443359375,
-  "Pan.Y": -202.890869140625,
+  "Pan.X": -477.804443359375,
+  "Pan.Y": -223.390869140625,
   "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
@@ -207,7 +207,7 @@
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Refactor line padding (need padding above and below)",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 14 2022 01:54:25"
     }
