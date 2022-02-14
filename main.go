@@ -19,6 +19,7 @@ func main() {
 	ebiten.SetWindowSize(1600, 900)
 	ebiten.SetWindowDecorated(false)
 	ebiten.SetRunnableOnUnfocused(false)
+	ebiten.SetMaxTPS(30)
 
 	ed := editor.NewEditor()
 

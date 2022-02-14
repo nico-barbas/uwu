@@ -23,6 +23,10 @@ type List struct {
 	TextClr    Color
 	Root       SubList
 	IndentSize float64
+
+	cursorVisible bool
+	cursorRect    Rectangle
+	selectedNode  ListNode
 }
 
 func (l *List) init() {
@@ -32,19 +36,48 @@ func (l *List) init() {
 		Width:  l.rect.Width - l.Style.Margin[0]*2,
 		Height: l.rect.Height - l.Style.Margin[1]*2,
 	}
+	// Lots of assumptions made here
+	// Isn't really flexible
+	l.cursorRect = Rectangle{
+		X:      l.activeRect.X,
+		Width:  l.activeRect.Width,
+		Height: l.TextSize,
+	}
 	l.Root = NewSubList(l.Name)
+	l.Root.origin = Point{
+		l.activeRect.X,
+		l.activeRect.Y,
+	}
 }
 
 func (l *List) update() {
 	mPos := mousePosition()
 	if l.activeRect.pointInBounds(mPos) {
-
+		l.cursorVisible = true
+		itemStartPos := l.activeRect.Y
+		for {
+			itemEndPos := itemStartPos + l.TextSize
+			if mPos[1] >= itemStartPos && mPos[1] <= itemEndPos {
+				l.cursorRect.Y = itemStartPos
+				break
+			}
+			itemStartPos = itemEndPos
+		}
+	} else {
+		l.cursorVisible = false
 	}
 }
 
 func (l *List) draw(buf *renderBuffer) {
 	bgEntry := l.Background.entry(l.rect)
 	buf.addEntry(bgEntry)
+	if l.cursorVisible {
+		buf.addEntry(RenderEntry{
+			Kind: RenderRectangle,
+			Rect: l.cursorRect,
+			Clr:  Color{l.TextClr[0], l.TextClr[1], l.TextClr[2], 155},
+		})
+	}
 	RootRect := Rectangle{
 		X:      l.activeRect.X,
 		Y:      l.activeRect.Y,
@@ -64,16 +97,20 @@ func (l *List) SortList() {
 type ListNode interface {
 	name() string
 	draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent float64) float64
+	getOrigin() Point
+	setOrigin(p Point)
 }
 
 type (
 	SubList struct {
-		Name  string
-		items []ListNode
+		Name   string
+		items  []ListNode
+		origin Point
 	}
 
 	ListItem struct {
-		Name string
+		Name   string
+		origin Point
 	}
 )
 
@@ -148,6 +185,14 @@ func (s *SubList) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent
 	return yPtr
 }
 
+func (s *SubList) getOrigin() Point {
+	return s.origin
+}
+
+func (s *SubList) setOrigin(p Point) {
+	s.origin = p
+}
+
 func (l *ListItem) name() string {
 	return l.Name
 }
@@ -161,4 +206,12 @@ func (l *ListItem) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, inden
 		Text: l.Name,
 	})
 	return r.Height + listLineSpacing
+}
+
+func (l *ListItem) getOrigin() Point {
+	return l.origin
+}
+
+func (l *ListItem) setOrigin(p Point) {
+	l.origin = p
 }

@@ -4,8 +4,8 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -610.4407348632812,
-  "Pan.Y": -233.6087188720703,
+  "Pan.X": -701.8491821289062,
+  "Pan.Y": -242.95843505859375,
   "ZoomLevel": 3,
   "TaskTransparency": 5,
   "OutlineTasks": true,
@@ -275,13 +275,25 @@
       "BoardIndex": 0,
       "Position.X": 480,
       "Position.Y": 64,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Text editor mouse picking is placing the caret 1 off",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 14 2022 17:47:33"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 672,
+      "Position.Y": 224,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Disable Cursor flickering when moving it in Textbox",
+      "Selected": true,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 14 2022 18:09:20"
     }
   ]
 }

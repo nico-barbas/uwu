@@ -41,8 +41,8 @@ func (t *treeview) loadProject(p *project) {
 		switch f := v.(type) {
 		case *folder:
 			subList := ui.NewSubList(k)
-			populateSubList(&subList, f)
 			t.list.AddItem(&subList)
+			populateSubList(&subList, f)
 		case file:
 			t.list.AddItem(&ui.ListItem{Name: k})
 		}
