@@ -534,7 +534,7 @@ func (t *TextBox) moveCursorToMouse(mPos Point) {
 				if mPos[0] >= currentXStartPos && mPos[0] <= currentXEndPos {
 					break
 				}
-				t.caret = j
+				t.caret = j + 1
 				t.cursor.X += advance
 				currentXStartPos = currentXEndPos
 			}
