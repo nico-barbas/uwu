@@ -278,7 +278,9 @@ func NewEditor() *Editor {
 	// subFolder := ui.NewSubList("subFolder")
 	{
 		p := openProject("./")
-		fmt.Printf("%#v\n", p)
+		for k := range p.root.nodes {
+			ed.treeView.AddItem(&ui.ListItem{Name: k})
+		}
 		// files, err := os.ReadDir("./")
 		// if err != nil {
 		// 	panic(err)
