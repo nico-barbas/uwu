@@ -23,18 +23,21 @@ type (
 		// in the off-chance that the edited text
 		// is incredibly long and its size can't be
 		// accounted beforehand
-		Cap         int
-		charBuf     []rune
-		charCount   int
-		lines       []line
-		lineCount   int
-		caret       int
-		lineIndex   int
-		currentLine *line
+		Cap           int
+		charBuf       []rune
+		charCount     int
+		lines         []line
+		lineCount     int
+		caret         int
+		lineIndex     int
+		currentLine   *line
+		currentIndent int
 
 		activeRect  Rectangle
 		Margin      float64
 		LinePadding float64
+		TabSize     int
+		AutoIndent  bool
 		Font        Font
 		TextSize    float64
 		TextClr     Color
@@ -64,8 +67,9 @@ type (
 		// A sub slice of the backing buffer
 		// with a record of the start and end in
 		// the editor's buffer
-		start int
-		end   int
+		start     int
+		end       int
+		indentEnd int
 
 		tokens []token
 		count  int
@@ -104,8 +108,8 @@ func (t *TextBox) init() {
 			t.activeRect.Y,
 		},
 	}
+	t.lines[0].tokens = make([]token, initialTokenCap)
 	if t.HasSyntaxHighlight {
-		t.lines[0].tokens = make([]token, initialTokenCap)
 		t.TextClr = t.clrStyle.Normal
 	}
 	t.lineIndex = 0
@@ -147,13 +151,18 @@ func (t *TextBox) update() {
 			if isKeyRepeated(keyCtlr) {
 				// delete word
 			} else {
-				t.deleteChar()
+				if t.caret == t.currentLine.indentEnd {
+					t.deleteIndent()
+				} else {
+					t.deleteChar()
+				}
 			}
 		}
 		if isKeyRepeated(keyEnter) {
-			// t.insertChar('\n')
-			// t.insertNewline()
 			t.insertLine()
+		}
+		if isKeyRepeated(keyTab) {
+			t.insertIndent()
 		}
 		switch {
 		case isKeyRepeated(keyUp):
@@ -187,13 +196,13 @@ func (t *TextBox) draw(buf *renderBuffer) {
 
 	for i := 0; i < t.lineCount; i += 1 {
 		line := &t.lines[i]
-		switch t.HasSyntaxHighlight {
-		case true:
-			var xptr float64 = 0
-			for j := 0; j < line.count; j += 1 {
-				var clr Color
-				token := line.tokens[j]
-				text := string(t.charBuf[line.start+token.start : line.start+token.end])
+		var xptr float64 = 0
+		for j := 0; j < line.count; j += 1 {
+			var clr Color
+			token := line.tokens[j]
+			text := string(t.charBuf[line.start+token.start : line.start+token.end])
+			switch t.HasSyntaxHighlight {
+			case true:
 				switch token.kind {
 				case tokenIdentifier:
 					clr = t.clrStyle.Normal
@@ -204,35 +213,38 @@ func (t *TextBox) draw(buf *renderBuffer) {
 				default:
 					clr = t.clrStyle.Normal
 				}
-				buf.addEntry(RenderEntry{
-					Kind: RenderText,
-					Rect: Rectangle{
-						X:      line.origin[0] + xptr,
-						Y:      line.origin[1],
-						Height: t.TextSize,
-					},
-					Clr:  clr,
-					Font: t.Font,
-					Text: text,
-				})
-				xptr += token.width
+			case false:
+				clr = t.TextClr
 			}
-		case false:
-			end := line.end
-			text := string(t.charBuf[line.start:end])
-			textEntry := RenderEntry{
+			buf.addEntry(RenderEntry{
 				Kind: RenderText,
 				Rect: Rectangle{
-					X:      line.origin[0],
+					X:      line.origin[0] + xptr,
 					Y:      line.origin[1],
 					Height: t.TextSize,
 				},
-				Clr:  t.TextClr,
+				Clr:  clr,
 				Font: t.Font,
 				Text: text,
-			}
-			buf.addEntry(textEntry)
+			})
+			xptr += token.width
 		}
+		// case false:
+		// 	end := line.end
+		// 	text := string(t.charBuf[line.start:end])
+		// 	textEntry := RenderEntry{
+		// 		Kind: RenderText,
+		// 		Rect: Rectangle{
+		// 			X:      line.origin[0],
+		// 			Y:      line.origin[1],
+		// 			Height: t.TextSize,
+		// 		},
+		// 		Clr:  t.TextClr,
+		// 		Font: t.Font,
+		// 		Text: text,
+		// 	}
+		// 	buf.addEntry(textEntry)
+		// }
 		if t.HasRuler {
 
 			lnWidth := t.Font.MeasureText(line.text, t.TextSize)
@@ -282,9 +294,7 @@ func (t *TextBox) insertChar(r rune) {
 	t.cursor.X += t.Font.GlyphAdvance(r, t.TextSize)
 	t.caret += 1
 
-	if t.HasSyntaxHighlight {
-		t.lexLine(t.currentLine)
-	}
+	t.lexLine(t.currentLine)
 }
 
 func (t *TextBox) deleteChar() {
@@ -307,9 +317,7 @@ func (t *TextBox) deleteChar() {
 		}
 	}
 
-	if t.HasSyntaxHighlight {
-		t.lexLine(t.currentLine)
-	}
+	t.lexLine(t.currentLine)
 }
 
 func (t *TextBox) insertNewline() {
@@ -322,14 +330,37 @@ func (t *TextBox) insertNewline() {
 	}
 }
 
+func (t *TextBox) insertIndent() {
+	// copy(t.charBuf[t.caret+t.TabSize:], t.charBuf[t.caret:t.charCount])
+	if t.caret == t.currentLine.indentEnd {
+		t.currentIndent += 1
+		t.currentLine.indentEnd += t.TabSize
+		// t.currentLine.indent += 1
+	}
+	for i := 0; i < t.TabSize; i += 1 {
+		t.insertChar(' ')
+	}
+}
+
+func (t *TextBox) deleteIndent() {
+	if t.currentLine.start == t.currentLine.indentEnd {
+		t.deleteChar()
+	} else {
+		t.currentIndent -= 1
+		t.currentLine.indentEnd -= t.TabSize
+		// t.currentLine.indent -= 1
+		for i := 0; i < t.TabSize; i += 1 {
+			t.deleteChar()
+		}
+	}
+}
+
 func (t *TextBox) insertLine() {
 	t.insertNewline()
 	newlineStart := t.caret + 1
 	newlineEnd := t.currentLine.end + 1
 	t.currentLine.end = t.caret
-	if t.HasSyntaxHighlight {
-		t.lexLine(t.currentLine)
-	}
+	t.lexLine(t.currentLine)
 
 	t.lineCount += 1
 	for i := t.lineIndex + 2; i < t.lineCount; i += 1 {
@@ -341,20 +372,27 @@ func (t *TextBox) insertLine() {
 	t.lineIndex += 1
 	t.currentLine = &t.lines[t.lineIndex]
 	t.lines[t.lineIndex] = line{
-		id:    t.lineIndex,
-		text:  fmt.Sprint(t.lineIndex + 1),
-		start: newlineStart,
-		end:   newlineEnd,
+		id:        t.lineIndex,
+		text:      fmt.Sprint(t.lineIndex + 1),
+		start:     newlineStart,
+		end:       newlineEnd,
+		indentEnd: newlineStart,
 		origin: Point{
 			t.lines[t.lineIndex-1].origin[0],
 			t.lines[t.lineIndex-1].origin[1] + t.TextSize + t.LinePadding,
 		},
 	}
-	if t.HasSyntaxHighlight {
-		t.currentLine.tokens = make([]token, initialTokenCap)
-		t.lexLine(t.currentLine)
-	}
+	t.currentLine.tokens = make([]token, initialTokenCap)
 	t.moveCursorLineStart()
+	if t.AutoIndent {
+		for i := 0; i < t.currentIndent; i += 1 {
+			for j := 0; j < t.TabSize; j += 1 {
+				t.insertChar(' ')
+				t.currentLine.indentEnd += 1
+			}
+		}
+	}
+	t.lexLine(t.currentLine)
 }
 
 // Do we assume that the carret is on the deleted line?
@@ -506,11 +544,15 @@ func (t *TextBox) moveCursorLineStart() {
 
 func (t *TextBox) moveCursorLineEnd() {
 	t.caret = t.currentLine.end
-	lineSize := t.Font.MeasureText(
-		string(t.charBuf[t.currentLine.start:t.currentLine.end]),
-		t.TextSize,
-	)
-	t.cursor.X = t.currentLine.origin[0] + lineSize[0]
+	var lineAdvance float64
+	for i := t.currentLine.start; i < t.currentLine.end; i += 1 {
+		lineAdvance += t.Font.GlyphAdvance(t.charBuf[i], t.TextSize)
+	}
+	// lineSize := t.Font.MeasureText(
+	// 	string(t.charBuf[t.currentLine.start:t.currentLine.end]),
+	// 	t.TextSize,
+	// )
+	t.cursor.X = t.currentLine.origin[0] + lineAdvance
 	t.cursor.Y = t.currentLine.origin[1]
 }
 

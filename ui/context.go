@@ -183,6 +183,7 @@ func (c *Context) UpdateUI(data Input) {
 		c.input.keys[keyCtlr] = data.Ctrl
 		c.input.keys[keyShift] = data.Shift
 		c.input.keys[keySpace] = data.Space
+		c.input.keys[keyTab] = data.Tab
 		c.input.keys[keyUp] = data.Up
 		c.input.keys[keyDown] = data.Down
 		c.input.keys[keyLeft] = data.Left

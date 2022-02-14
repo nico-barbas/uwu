@@ -131,11 +131,11 @@
       "BoardIndex": 0,
       "Position.X": 272,
       "Position.Y": 208,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Move to cursor",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 13 2022 19:07:35"
     }, 

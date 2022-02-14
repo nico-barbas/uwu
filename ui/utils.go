@@ -194,6 +194,7 @@ const (
 	keyCtlr
 	keyShift
 	keySpace
+	keyTab
 	keyUp
 	keyDown
 	keyLeft
@@ -226,6 +227,7 @@ type (
 		Ctrl  bool
 		Shift bool
 		Space bool
+		Tab   bool
 
 		Up    bool
 		Down  bool

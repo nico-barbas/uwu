@@ -42,6 +42,7 @@ func (ed *Editor) Update() error {
 		Enter: ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeyKPEnter),
 		Del:   ebiten.IsKeyPressed(ebiten.KeyBackspace),
 		Ctrl:  ebiten.IsKeyPressed(ebiten.KeyControlLeft) || ebiten.IsKeyPressed(ebiten.KeyControlRight),
+		Tab:   ebiten.IsKeyPressed(ebiten.KeyTab),
 		Left:  ebiten.IsKeyPressed(ebiten.KeyLeft),
 		Right: ebiten.IsKeyPressed(ebiten.KeyRight),
 		Up:    ebiten.IsKeyPressed(ebiten.KeyUp),
@@ -295,6 +296,8 @@ func NewEditor() *Editor {
 		Margin:             10,
 		Font:               &ed.font,
 		TextSize:           12,
+		TabSize:            2,
+		AutoIndent:         true,
 		HasRuler:           true,
 		HasSyntaxHighlight: true,
 	}
