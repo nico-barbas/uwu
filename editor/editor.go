@@ -20,7 +20,7 @@ type Editor struct {
 	layout Image
 
 	window   ui.Handle
-	treeView *ui.List
+	treeView treeview
 
 	statusbar statusBar
 }
@@ -256,39 +256,11 @@ func NewEditor() *Editor {
 			Margin:   ui.Point{0, 0},
 		},
 	}, rem-20)
-	ed.treeView = &ui.List{
-		Background: ui.Background{
-			Visible: true,
-			Kind:    ui.BackgroundImageSlice,
-			Clr:     ui.Color{232, 152, 168, 255},
-			Img:     &ed.layout,
-			Constr:  ui.Constraint{2, 2, 2, 2},
-		},
-		Style: ui.Style{
-			Padding: 3,
-			Margin:  ui.Point{5, 0},
-		},
 
-		Name:       "Root",
-		Font:       &ed.font,
-		TextSize:   12,
-		TextClr:    uwuTextClr,
-		IndentSize: 10,
-	}
-	ui.AddWidget(lyt, ed.treeView, 140)
-	{
-		ed.project = openProject("./")
-		for k, v := range ed.project.root.nodes {
-			switch f := v.(type) {
-			case *folder:
-				subList := ui.NewSubList(k)
-				populateSubList(&subList, f)
-				ed.treeView.AddItem(&subList)
-			case file:
-				ed.treeView.AddItem(&ui.ListItem{Name: k})
-			}
-		}
-	}
+	// Project and Treeview display
+	ed.project = openProject("./")
+	ed.treeView = newTreeview(lyt, &ed.layout, &ed.font)
+	ed.treeView.loadProject(&ed.project)
 
 	// Text editor
 	editor := &ui.TextBox{

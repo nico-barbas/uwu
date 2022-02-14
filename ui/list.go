@@ -2,6 +2,7 @@ package ui
 
 import (
 	"log"
+	"sort"
 )
 
 const (
@@ -34,6 +35,13 @@ func (l *List) init() {
 	l.Root = NewSubList(l.Name)
 }
 
+func (l *List) update() {
+	mPos := mousePosition()
+	if l.activeRect.pointInBounds(mPos) {
+
+	}
+}
+
 func (l *List) draw(buf *renderBuffer) {
 	bgEntry := l.Background.entry(l.rect)
 	buf.addEntry(bgEntry)
@@ -47,6 +55,10 @@ func (l *List) draw(buf *renderBuffer) {
 
 func (l *List) AddItem(i ListNode) {
 	l.Root.AddItem(i)
+}
+
+func (l *List) SortList() {
+	l.Root.sort()
 }
 
 type ListNode interface {
@@ -90,6 +102,19 @@ func (s *SubList) AddItem(i ListNode) {
 
 func (s *SubList) name() string {
 	return s.Name
+}
+
+func (s *SubList) sort() {
+	sortFn := func(i, j int) bool {
+		return s.items[i].name() < s.items[j].name()
+	}
+	sort.SliceStable(s.items, sortFn)
+	for _, item := range s.items {
+		switch s := item.(type) {
+		case *SubList:
+			s.sort()
+		}
+	}
 }
 
 func (s *SubList) draw(buf *renderBuffer, f Font, r Rectangle, clr Color, indent float64) float64 {
