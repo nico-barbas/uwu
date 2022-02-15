@@ -56,9 +56,9 @@ func populateSubList(l *ui.SubList, f *folder) {
 		case *folder:
 			subList := ui.NewSubList(k)
 			populateSubList(&subList, f)
-			l.AddItem(&subList)
+			l.AddItem(&subList, 10, 12)
 		case file:
-			l.AddItem(&ui.ListItem{Name: k})
+			l.AddItem(&ui.ListItem{Name: k}, 10, 12)
 		}
 	}
 }
