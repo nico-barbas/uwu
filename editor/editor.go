@@ -281,7 +281,25 @@ func NewEditor() *Editor {
 		ShowCurrentLine:    true,
 	}
 	editor.SetLexKeywords([]string{
+		"type",
+		"struct",
+		"interface",
 		"func",
+		"go",
+		"return",
+		"bool",
+		"uint",
+		"uint8",
+		"uint16",
+		"uint32",
+		"uint64",
+		"int",
+		"int8",
+		"int16",
+		"int32",
+		"int64",
+		"float64",
+		"float32",
 	})
 	editor.SetSyntaxColors(ui.ColorStyle{
 		Normal:  uwuTextClr,
