@@ -23,6 +23,7 @@ type (
 		TextClr    Color
 		Root       SubList
 		IndentSize float64
+		Receiver   ListReceiver
 
 		cursorVisible bool
 		cursorRect    Rectangle
@@ -30,7 +31,7 @@ type (
 	}
 
 	SubList struct {
-		Name       string
+		ItemName   string
 		nameHeight float64
 		items      []ListNode
 		count      int
@@ -38,14 +39,18 @@ type (
 	}
 
 	ListItem struct {
-		Name   string
-		origin Point
-		height float64
+		ItemName string
+		origin   Point
+		height   float64
+	}
+
+	ListReceiver interface {
+		OnItemSelected(item ListNode)
 	}
 )
 
 type ListNode interface {
-	name() string
+	Name() string
 	draw(buf *renderBuffer, f Font, size float64, clr Color) float64
 	getOrigin() Point
 	setOrigin(p Point)
@@ -79,10 +84,18 @@ func (l *List) init() {
 func (l *List) update() {
 	mPos := mousePosition()
 	if l.activeRect.pointInBounds(mPos) {
-		l.cursorVisible = true
 		l.selectedNode = l.Root.selectNode(mPos)
 		if l.selectedNode != nil {
+			l.cursorVisible = true
 			l.cursorRect.Y = l.selectedNode.getOrigin()[1]
+			if isMouseJustPressed() {
+				if l.Receiver != nil {
+					l.Receiver.OnItemSelected(l.selectedNode)
+				} else {
+					log.SetPrefix("[UI Debug]: ")
+					log.Println("No receiver attached to this list")
+				}
+			}
 		} else {
 			l.cursorVisible = false
 		}
@@ -114,17 +127,17 @@ func (l *List) SortList() {
 
 func NewSubList(name string) SubList {
 	return SubList{
-		Name:  name,
-		items: make([]ListNode, subListInitialCap),
+		ItemName: name,
+		items:    make([]ListNode, subListInitialCap),
 	}
 }
 
 func (s *SubList) AddItem(i ListNode, indentSize float64, lineSize float64) {
-	name := i.name()
+	name := i.Name()
 	var exist bool
 	for i := 0; i < s.count; i += 1 {
 		item := s.items[i]
-		if item.name() == name {
+		if item.Name() == name {
 			exist = true
 			break
 		}
@@ -147,13 +160,13 @@ func (s *SubList) AddItem(i ListNode, indentSize float64, lineSize float64) {
 	}
 }
 
-func (s *SubList) name() string {
-	return s.Name
+func (s *SubList) Name() string {
+	return s.ItemName
 }
 
 func (s *SubList) sort(lineSize float64) {
 	sortFn := func(i, j int) bool {
-		return s.items[i].name() < s.items[j].name()
+		return s.items[i].Name() < s.items[j].Name()
 	}
 	sort.SliceStable(s.items[:s.count], sortFn)
 	yPtr := s.origin[1] + lineSize
@@ -182,7 +195,7 @@ func (s *SubList) draw(buf *renderBuffer, f Font, size float64, clr Color) float
 		},
 		Clr:  clr,
 		Font: f,
-		Text: s.Name,
+		Text: s.ItemName,
 	})
 	yPtr := size
 	for i := 0; i < s.count; i += 1 {
@@ -245,8 +258,8 @@ func (s *SubList) setHeight(h float64) {
 	s.nameHeight = h
 }
 
-func (l *ListItem) name() string {
-	return l.Name
+func (l *ListItem) Name() string {
+	return l.ItemName
 }
 
 func (l *ListItem) draw(buf *renderBuffer, f Font, size float64, clr Color) float64 {
@@ -259,7 +272,7 @@ func (l *ListItem) draw(buf *renderBuffer, f Font, size float64, clr Color) floa
 		},
 		Clr:  clr,
 		Font: f,
-		Text: l.Name,
+		Text: l.ItemName,
 	})
 	return size
 }

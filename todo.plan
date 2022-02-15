@@ -4,9 +4,9 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -525.6052856445312,
-  "Pan.Y": -177.0643310546875,
-  "ZoomLevel": 4,
+  "Pan.X": -701.8491821289062,
+  "Pan.Y": -242.95843505859375,
+  "ZoomLevel": 3,
   "TaskTransparency": 5,
   "OutlineTasks": true,
   "BracketSubtasks": true,
@@ -17,7 +17,7 @@
   "PulsingTaskSelection": false,
   "GridVisible": true,
   "GridSize": 16,
-  "BackupInterval": 15,
+  "BackupInterval": 0,
   "BackupKeepCount": 1,
   "UndoMaxSteps": 0,
   "AlwaysShowURLButtons": false,
@@ -99,7 +99,7 @@
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": " Interactive tree view (click and open)",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 13 2022 19:07:07"
     }, 
@@ -294,42 +294,6 @@
       "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 14 2022 18:09:20"
-    }, 
-    {
-      "BoardIndex": 0,
-      "Position.X": 672,
-      "Position.Y": 240,
-      "Checkbox.Checked": false,
-      "Progression.Current": 0,
-      "Progression.Max": 0,
-      "Description": "Add Render Command kind for pushing and popping clipping rect",
-      "Selected": false,
-      "TaskType.CurrentChoice": 0,
-      "CreationTime": "Feb 15 2022 01:00:01"
-    }, 
-    {
-      "BoardIndex": 0,
-      "Position.X": 672,
-      "Position.Y": 256,
-      "Checkbox.Checked": false,
-      "Progression.Current": 0,
-      "Progression.Max": 0,
-      "Description": "Rework RenderEntry to an interface to allow for more flexibility",
-      "Selected": false,
-      "TaskType.CurrentChoice": 0,
-      "CreationTime": "Feb 15 2022 01:06:29"
-    }, 
-    {
-      "BoardIndex": 0,
-      "Position.X": 672,
-      "Position.Y": 272,
-      "Checkbox.Checked": false,
-      "Progression.Current": 0,
-      "Progression.Max": 0,
-      "Description": "Add \"RenderHeader\" Command kind\nThis would allow for letting the user know what is being done\nand letting them cache to a render target and skip if not dirty",
-      "Selected": false,
-      "TaskType.CurrentChoice": 0,
-      "CreationTime": "Feb 15 2022 01:07:28"
     }
   ]
 }

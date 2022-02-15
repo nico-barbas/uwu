@@ -1,6 +1,8 @@
 package editor
 
-import "github.com/nico-ec/uwu/ui"
+import (
+	"github.com/nico-ec/uwu/ui"
+)
 
 const (
 	treeviewWidth = 140
@@ -37,6 +39,7 @@ func newTreeview(edParent ui.Handle, sepImg *Image, font *Font) treeview {
 }
 
 func (t *treeview) loadProject(p *project) {
+	t.list.Receiver = t
 	for k, v := range p.root.nodes {
 		switch f := v.(type) {
 		case *folder:
@@ -44,10 +47,14 @@ func (t *treeview) loadProject(p *project) {
 			t.list.AddItem(&subList)
 			populateSubList(&subList, f)
 		case file:
-			t.list.AddItem(&ui.ListItem{Name: k})
+			t.list.AddItem(&ui.ListItem{ItemName: k})
 		}
 	}
 	t.list.SortList()
+}
+
+func (t *treeview) OnItemSelected(item ui.ListNode) {
+	openProjectFile(item.Name())
 }
 
 func populateSubList(l *ui.SubList, f *folder) {
@@ -58,7 +65,7 @@ func populateSubList(l *ui.SubList, f *folder) {
 			populateSubList(&subList, f)
 			l.AddItem(&subList, 10, 12)
 		case file:
-			l.AddItem(&ui.ListItem{Name: k}, 10, 12)
+			l.AddItem(&ui.ListItem{ItemName: k}, 10, 12)
 		}
 	}
 }

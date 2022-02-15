@@ -3,12 +3,15 @@ package editor
 import (
 	"fmt"
 	"image"
+	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/nico-ec/uwu/ui"
 )
+
+var ed *Editor
 
 type Editor struct {
 	ctx     *ui.Context
@@ -183,7 +186,7 @@ func (e *Editor) Layout(w, h int) (int, int) {
 }
 
 func NewEditor() *Editor {
-	ed := new(Editor)
+	ed = new(Editor)
 	ed.ctx = ui.NewContext()
 	ed.ctx.SetCursorShapeCallback(changeEditorCursorShape)
 	ui.MakeContextCurrent(ed.ctx)
@@ -258,7 +261,7 @@ func NewEditor() *Editor {
 	}, rem-20)
 
 	// Project and Treeview display
-	ed.project = openProject("./")
+	ed.project = openProject(".")
 	ed.treeView = newTreeview(lyt, &ed.layout, &ed.font)
 	ed.treeView.loadProject(&ed.project)
 
@@ -291,6 +294,19 @@ func NewEditor() *Editor {
 	ed.statusbar = newStatusBar(ed.window, txtEdit, &ed.font)
 
 	return ed
+}
+
+// func getProjectNode(name string) projectNode {
+// 	return ed.project.findNode(name)
+// }
+
+func openProjectFile(name string) {
+	node := ed.project.findNode(name)
+	data, err := os.ReadFile(node.path())
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(data))
 }
 
 func changeEditorCursorShape(s ui.CursorShape) {
