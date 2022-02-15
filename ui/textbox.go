@@ -583,36 +583,27 @@ func (t *TextBox) moveCursorToPreviousWord() {
 }
 
 func (t *TextBox) moveCursorToMouse(mPos Point) {
-	lineFound := false
 	relPos := mPos[1] - t.activeRect.Y
-	lineIndex := int(relPos / (t.TextSize + t.LinePadding))
-	fmt.Println(lineIndex)
-	for i := 0; i < t.lineCount; i += 1 {
-		lineYStartPos := t.lines[i].origin[1]
-		lineYEndPos := lineYStartPos + (t.TextSize + t.LinePadding)
-		if mPos[1] >= lineYStartPos && mPos[1] <= lineYEndPos {
-			t.lineIndex = i
-			t.currentLine = &t.lines[i]
-			// Search for the correct rune to position the cursor to
-			selectedLine := &t.lines[i]
-			currentXStartPos := selectedLine.origin[0]
-			currentXEndPos := currentXStartPos
-			t.moveCursorLineStart()
-			for j := selectedLine.start; j < selectedLine.end; j += 1 {
-				advance := t.Font.GlyphAdvance(t.charBuf[j], t.TextSize)
-				currentXEndPos += advance
-				if mPos[0] >= currentXStartPos && mPos[0] <= currentXEndPos {
-					break
-				}
-				t.caret = j + 1
-				t.cursor.X += advance
-				currentXStartPos = currentXEndPos
+	t.lineIndex = int(relPos / (t.TextSize + t.LinePadding))
+	if t.lineIndex >= 0 && t.lineIndex < t.lineCount {
+		t.currentLine = &t.lines[t.lineIndex]
+
+		// Search for the correct rune to position the cursor to
+		selectedLine := &t.lines[t.lineIndex]
+		currentXStartPos := selectedLine.origin[0]
+		currentXEndPos := currentXStartPos
+		t.moveCursorLineStart()
+		for j := selectedLine.start; j < selectedLine.end; j += 1 {
+			advance := t.Font.GlyphAdvance(t.charBuf[j], t.TextSize)
+			currentXEndPos += advance
+			if mPos[0] >= currentXStartPos && mPos[0] <= currentXEndPos {
+				break
 			}
-			lineFound = true
-			break
+			t.caret = j + 1
+			t.cursor.X += advance
+			currentXStartPos = currentXEndPos
 		}
-	}
-	if !lineFound {
+	} else {
 		t.lineIndex = t.lineCount - 1
 		t.currentLine = &t.lines[t.lineIndex]
 		t.moveCursorLineEnd()
