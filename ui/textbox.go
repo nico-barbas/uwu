@@ -1,6 +1,9 @@
 package ui
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 // Everything here is a little experimental and prototypish
 
@@ -295,6 +298,70 @@ func (t *TextBox) draw(buf *renderBuffer) {
 	}
 }
 
+func (t *TextBox) LoadBufferData(data []rune) error {
+	if len(data) > t.Cap {
+		log.SetPrefix("[UI Debug]: ")
+		log.Println("Given file is too big compared to the TextBox capacity")
+		return fmt.Errorf("given file is too big")
+	}
+	t.charCount = len(data)
+	t.lineCount = 0
+	t.lineIndex = 0
+	t.caret = 0
+
+	t.lines[0] = line{
+		id:    0,
+		text:  fmt.Sprint(1),
+		start: 0,
+		end:   0,
+		origin: Point{
+			t.activeRect.X,
+			t.activeRect.Y,
+		},
+		tokens: make([]token, initialTokenCap),
+	}
+	t.lineCount += 1
+
+	var current int = 0
+	var c rune
+	for {
+		if current >= len(data) {
+			break
+		}
+		c = data[current]
+		t.charBuf[current] = c
+		current += 1
+		if c == '\r' && data[current] == '\n' {
+			current += 1
+			i := current
+
+			t.lineIndex += 1
+			t.lines[t.lineCount] = line{
+				id:        t.lineCount,
+				text:      fmt.Sprint(t.lineCount + 1),
+				start:     i,
+				end:       i,
+				indentEnd: i,
+				origin: Point{
+					t.lines[t.lineCount-1].origin[0],
+					t.lines[t.lineCount-1].origin[1] + t.TextSize + t.LinePadding,
+				},
+				tokens: make([]token, initialTokenCap),
+			}
+			t.lineCount += 1
+			continue
+		}
+		t.lines[t.lineIndex].end += 1
+
+	}
+	t.lineIndex = 0
+	t.currentLine = &t.lines[t.lineIndex]
+	for i := 0; i < t.lineCount; i += 1 {
+		t.lexLine(&t.lines[i])
+	}
+	return nil
+}
+
 func (t *TextBox) insertChar(r rune) {
 	copy(t.charBuf[t.caret+1:], t.charBuf[t.caret:t.charCount])
 	t.charBuf[t.caret] = r
@@ -334,12 +401,13 @@ func (t *TextBox) deleteChar() {
 }
 
 func (t *TextBox) insertNewline() {
-	copy(t.charBuf[t.caret+1:], t.charBuf[t.caret:t.charCount])
-	t.charBuf[t.caret] = '\n'
-	t.charCount += 1
+	copy(t.charBuf[t.caret+2:], t.charBuf[t.caret:t.charCount])
+	t.charBuf[t.caret] = '\r'
+	t.charBuf[t.caret+1] = '\n'
+	t.charCount += 2
 	for i := t.currentLine.id + 1; i < t.lineCount; i += 1 {
-		t.lines[i].start += 1
-		t.lines[i].end += 1
+		t.lines[i].start += 2
+		t.lines[i].end += 2
 	}
 }
 
@@ -370,11 +438,12 @@ func (t *TextBox) deleteIndent() {
 
 func (t *TextBox) insertLine() {
 	t.insertNewline()
-	newlineStart := t.caret + 1
-	newlineEnd := t.currentLine.end + 1
+	newlineStart := t.caret + 2
+	newlineEnd := t.currentLine.end + 2
 	t.currentLine.end = t.caret
 	t.lexLine(t.currentLine)
 
+	// Move all the line by one to make room for the new line
 	t.lineCount += 1
 	for i := t.lineIndex + 2; i < t.lineCount; i += 1 {
 		t.lines[i] = t.lines[i-1]
@@ -641,7 +710,7 @@ lex:
 		start := t.lexer.current
 		c := t.lexer.advance()
 		switch c {
-		case '\n':
+		case '\n', '\r':
 			tok.kind = tokenNewline
 
 		case ' ':

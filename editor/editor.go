@@ -1,6 +1,7 @@
 package editor
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 	"os"
@@ -24,6 +25,7 @@ type Editor struct {
 
 	window   ui.Handle
 	treeView treeview
+	textBox  *ui.TextBox
 
 	statusbar statusBar
 }
@@ -266,7 +268,7 @@ func NewEditor() *Editor {
 	ed.treeView.loadProject(&ed.project)
 
 	// Text editor
-	editor := &ui.TextBox{
+	ed.textBox = &ui.TextBox{
 		Background: ui.Background{
 			Visible: false,
 		},
@@ -280,7 +282,10 @@ func NewEditor() *Editor {
 		HasSyntaxHighlight: true,
 		ShowCurrentLine:    true,
 	}
-	editor.SetLexKeywords([]string{
+	// Temporary. Those are go keywords
+	// Allow for user to set their prefered
+	// language from a given .toml file
+	ed.textBox.SetLexKeywords([]string{
 		"type",
 		"struct",
 		"interface",
@@ -301,12 +306,12 @@ func NewEditor() *Editor {
 		"float64",
 		"float32",
 	})
-	editor.SetSyntaxColors(ui.ColorStyle{
+	ed.textBox.SetSyntaxColors(ui.ColorStyle{
 		Normal:  uwuTextClr,
 		Keyword: uwuKeywordClr,
 		Digit:   uwuDigitClr,
 	})
-	txtEdit := ui.AddWidget(lyt, editor, ui.FitContainer)
+	txtEdit := ui.AddWidget(lyt, ed.textBox, ui.FitContainer)
 
 	// Status bar
 	ed.statusbar = newStatusBar(ed.window, txtEdit, &ed.font)
@@ -324,7 +329,8 @@ func openProjectFile(name string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(data))
+	d := bytes.Runes(data)
+	ed.textBox.LoadBufferData(d)
 }
 
 func changeEditorCursorShape(s ui.CursorShape) {
