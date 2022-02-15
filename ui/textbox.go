@@ -332,6 +332,7 @@ func (t *TextBox) LoadBufferData(data []rune) error {
 		t.charBuf[current] = c
 		current += 1
 		if c == '\r' && data[current] == '\n' {
+			t.charBuf[current] = '\n'
 			current += 1
 			i := current
 
@@ -360,6 +361,10 @@ func (t *TextBox) LoadBufferData(data []rune) error {
 		t.lexLine(&t.lines[i])
 	}
 	return nil
+}
+
+func (t *TextBox) GetCharBuffer() []rune {
+	return t.charBuf[:t.charCount]
 }
 
 func (t *TextBox) insertChar(r rune) {
@@ -415,12 +420,10 @@ func (t *TextBox) insertIndent() {
 	// copy(t.charBuf[t.caret+t.TabSize:], t.charBuf[t.caret:t.charCount])
 	if t.caret == t.currentLine.indentEnd {
 		t.currentIndent += 1
-		t.currentLine.indentEnd += t.TabSize
+		t.currentLine.indentEnd += 1
 		// t.currentLine.indent += 1
 	}
-	for i := 0; i < t.TabSize; i += 1 {
-		t.insertChar(' ')
-	}
+	t.insertChar('\t')
 }
 
 func (t *TextBox) deleteIndent() {
@@ -428,11 +431,8 @@ func (t *TextBox) deleteIndent() {
 		t.deleteChar()
 	} else {
 		t.currentIndent -= 1
-		t.currentLine.indentEnd -= t.TabSize
-		// t.currentLine.indent -= 1
-		for i := 0; i < t.TabSize; i += 1 {
-			t.deleteChar()
-		}
+		t.currentLine.indentEnd -= 1
+		t.deleteChar()
 	}
 }
 
@@ -468,10 +468,8 @@ func (t *TextBox) insertLine() {
 	t.moveCursorLineStart()
 	if t.AutoIndent {
 		for i := 0; i < t.currentIndent; i += 1 {
-			for j := 0; j < t.TabSize; j += 1 {
-				t.insertChar(' ')
-				t.currentLine.indentEnd += 1
-			}
+			t.insertChar('\t')
+			t.currentLine.indentEnd += 1
 		}
 	}
 	t.lexLine(t.currentLine)
@@ -586,6 +584,9 @@ func (t *TextBox) moveCursorToPreviousWord() {
 
 func (t *TextBox) moveCursorToMouse(mPos Point) {
 	lineFound := false
+	relPos := mPos[1] - t.activeRect.Y
+	lineIndex := int(relPos / (t.TextSize + t.LinePadding))
+	fmt.Println(lineIndex)
 	for i := 0; i < t.lineCount; i += 1 {
 		lineYStartPos := t.lines[i].origin[1]
 		lineYEndPos := lineYStartPos + (t.TextSize + t.LinePadding)

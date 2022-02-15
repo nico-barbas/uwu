@@ -1,13 +1,12 @@
 package editor
 
 import (
-	"bytes"
 	"fmt"
 	"image"
-	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/nico-ec/uwu/ui"
 )
@@ -25,7 +24,7 @@ type Editor struct {
 
 	window   ui.Handle
 	treeView treeview
-	textBox  *ui.TextBox
+	textEd   textEditor
 
 	statusbar statusBar
 }
@@ -56,6 +55,9 @@ func (ed *Editor) Update() error {
 	})
 
 	ed.statusbar.updateStatus()
+	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyS) {
+		ed.textEd.saveCurrentNode()
+	}
 	return nil
 }
 
@@ -268,69 +270,17 @@ func NewEditor() *Editor {
 	ed.treeView.loadProject(&ed.project)
 
 	// Text editor
-	ed.textBox = &ui.TextBox{
-		Background: ui.Background{
-			Visible: false,
-		},
-		Cap:                500,
-		Margin:             10,
-		Font:               &ed.font,
-		TextSize:           12,
-		TabSize:            2,
-		AutoIndent:         true,
-		HasRuler:           true,
-		HasSyntaxHighlight: true,
-		ShowCurrentLine:    true,
-	}
-	// Temporary. Those are go keywords
-	// Allow for user to set their prefered
-	// language from a given .toml file
-	ed.textBox.SetLexKeywords([]string{
-		"type",
-		"struct",
-		"interface",
-		"func",
-		"go",
-		"return",
-		"bool",
-		"uint",
-		"uint8",
-		"uint16",
-		"uint32",
-		"uint64",
-		"int",
-		"int8",
-		"int16",
-		"int32",
-		"int64",
-		"float64",
-		"float32",
-	})
-	ed.textBox.SetSyntaxColors(ui.ColorStyle{
-		Normal:  uwuTextClr,
-		Keyword: uwuKeywordClr,
-		Digit:   uwuDigitClr,
-	})
-	txtEdit := ui.AddWidget(lyt, ed.textBox, ui.FitContainer)
+	ed.textEd = newTextEditor(lyt)
 
 	// Status bar
-	ed.statusbar = newStatusBar(ed.window, txtEdit, &ed.font)
+	ed.statusbar = newStatusBar(ed.window, ed.textEd.handle, &ed.font)
 
 	return ed
 }
 
-// func getProjectNode(name string) projectNode {
-// 	return ed.project.findNode(name)
-// }
-
 func openProjectFile(name string) {
 	node := ed.project.findNode(name)
-	data, err := os.ReadFile(node.path())
-	if err != nil {
-		panic(err)
-	}
-	d := bytes.Runes(data)
-	ed.textBox.LoadBufferData(d)
+	ed.textEd.loadNode(node)
 }
 
 func changeEditorCursorShape(s ui.CursorShape) {
