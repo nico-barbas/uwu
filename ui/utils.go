@@ -269,8 +269,8 @@ func isKeyPressed(k key) bool {
 
 func isKeyRepeated(k key) bool {
 	const (
-		delay    = 30
-		interval = 3
+		delay    = 15
+		interval = 1
 	)
 	d := ctx.input.keyCounts[k]
 	if d == 1 {

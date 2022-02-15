@@ -4,9 +4,9 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -701.8491821289062,
-  "Pan.Y": -242.95843505859375,
-  "ZoomLevel": 3,
+  "Pan.X": -586.2943725585938,
+  "Pan.Y": -242.64804077148438,
+  "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
   "BracketSubtasks": true,
@@ -95,7 +95,7 @@
       "BoardIndex": 0,
       "Position.X": 208,
       "Position.Y": 208,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": " Interactive tree view (click and open)",
@@ -294,6 +294,42 @@
       "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 14 2022 18:09:20"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 480,
+      "Position.Y": 80,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Ctrl + direction doesn't wrap to newline",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 15 2022 18:25:05"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 480,
+      "Position.Y": 96,
+      "Checkbox.Checked": true,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Incorrect line copy when inserting a new line in a middle of a file",
+      "Selected": true,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 15 2022 18:25:26"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 192,
+      "Position.Y": 400,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Refactor tabs to use \\t instead of multiple spaces (maybe?)",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 15 2022 18:29:03"
     }
   ]
 }

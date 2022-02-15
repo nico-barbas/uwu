@@ -445,7 +445,7 @@ func (t *TextBox) insertLine() {
 
 	// Move all the line by one to make room for the new line
 	t.lineCount += 1
-	for i := t.lineIndex + 2; i < t.lineCount; i += 1 {
+	for i := t.lineCount - 1; i >= t.lineIndex+2; i -= 1 {
 		t.lines[i] = t.lines[i-1]
 		t.lines[i].id += 1
 		t.lines[i].text = fmt.Sprint(i + 1)
