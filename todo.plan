@@ -4,9 +4,9 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -701.8491821289062,
-  "Pan.Y": -242.95843505859375,
-  "ZoomLevel": 3,
+  "Pan.X": -525.6052856445312,
+  "Pan.Y": -177.0643310546875,
+  "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
   "BracketSubtasks": true,
@@ -99,7 +99,7 @@
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": " Interactive tree view (click and open)",
-      "Selected": false,
+      "Selected": true,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 13 2022 19:07:07"
     }, 
@@ -327,7 +327,7 @@
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Add \"RenderHeader\" Command kind\nThis would allow for letting the user know what is being done\nand letting them cache to a render target and skip if not dirty",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 15 2022 01:07:28"
     }

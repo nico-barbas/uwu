@@ -6,7 +6,6 @@ import (
 )
 
 const (
-	listLineSpacing   = 0
 	subListInitialCap = 10
 )
 
@@ -106,11 +105,11 @@ func (l *List) draw(buf *renderBuffer) {
 }
 
 func (l *List) AddItem(i ListNode) {
-	l.Root.AddItem(i, l.IndentSize, l.TextSize+listLineSpacing)
+	l.Root.AddItem(i, l.IndentSize, l.TextSize)
 }
 
 func (l *List) SortList() {
-	l.Root.sort(l.TextSize + listLineSpacing)
+	l.Root.sort(l.TextSize)
 }
 
 func NewSubList(name string) SubList {
@@ -185,7 +184,7 @@ func (s *SubList) draw(buf *renderBuffer, f Font, size float64, clr Color) float
 		Font: f,
 		Text: s.Name,
 	})
-	yPtr := size + listLineSpacing
+	yPtr := size
 	for i := 0; i < s.count; i += 1 {
 		item := s.items[i]
 		h := item.draw(buf, f, size, clr)
@@ -195,9 +194,9 @@ func (s *SubList) draw(buf *renderBuffer, f Font, size float64, clr Color) float
 		Kind: RenderRectangle,
 		Rect: Rectangle{
 			X:      s.origin[0],
-			Y:      s.origin[1] + size + listLineSpacing,
+			Y:      s.origin[1] + size,
 			Width:  1,
-			Height: yPtr - size + listLineSpacing,
+			Height: yPtr - size,
 		},
 		Clr: clr,
 	})
@@ -262,7 +261,7 @@ func (l *ListItem) draw(buf *renderBuffer, f Font, size float64, clr Color) floa
 		Font: f,
 		Text: l.Name,
 	})
-	return size + listLineSpacing
+	return size
 }
 
 func (l *ListItem) getOrigin() Point {
