@@ -10,9 +10,10 @@ import (
 )
 
 type textEditor struct {
-	currentEdit projectNode
-	// handle      ui.Handle
-	textBox *ui.TextBox
+	currentEdit    projectNode
+	textBox        *ui.TextBox
+	previousLine   int
+	previousColumn int
 }
 
 func newTextEditor(parent ui.Container) textEditor {
@@ -76,9 +77,21 @@ func newTextEditor(parent ui.Container) textEditor {
 		Digit:   uwuDigitClr,
 	})
 	tabView.AddTab("test.go", textEd.textBox)
-	// textEd.handle = ui.AddWidget(parent, textEd.textBox, ui.FitContainer)
 
 	return textEd
+}
+
+func (t *textEditor) updateTextEditor() {
+	ln, col := t.textBox.CurrentLine(), t.textBox.CurrentColumn()
+	switch {
+	case ln != t.previousLine:
+		FireSignal(EditorLineChanged, SignalInt(ln))
+		t.previousLine = ln
+		fallthrough
+	case col != t.previousColumn:
+		FireSignal(EditorColumnChanged, SignalInt(col))
+		t.previousColumn = col
+	}
 }
 
 func (t *textEditor) saveCurrentNode() {

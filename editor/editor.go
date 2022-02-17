@@ -11,11 +11,17 @@ import (
 	"github.com/nico-ec/uwu/ui"
 )
 
+const (
+	EditorLineChanged SignalKind = iota
+	EditorColumnChanged
+)
+
 var ed *Editor
 
 type Editor struct {
 	ctx     *ui.Context
 	project project
+	signals signalDispatcher
 
 	// Editor's resources
 	font   Font
@@ -54,7 +60,7 @@ func (ed *Editor) Update() error {
 		Down:  ebiten.IsKeyPressed(ebiten.KeyDown),
 	})
 
-	ed.statusbar.updateStatus()
+	ed.textEd.updateTextEditor()
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyS) {
 		ed.textEd.saveCurrentNode()
 	}
@@ -192,6 +198,7 @@ func (e *Editor) Layout(w, h int) (int, int) {
 func NewEditor() *Editor {
 	ed = new(Editor)
 	ed.ctx = ui.NewContext()
+	ed.signals.init()
 	ed.ctx.SetCursorShapeCallback(changeEditorCursorShape)
 	ui.MakeContextCurrent(ed.ctx)
 	ed.font = NewFont("assets/CozetteVector.ttf", 72, []int{12})
@@ -276,6 +283,7 @@ func NewEditor() *Editor {
 
 	// Status bar
 	ed.statusbar = newStatusBar(ed.window, &ed.font)
+	ed.statusbar.initStatusBar()
 
 	return ed
 }
@@ -294,4 +302,16 @@ func changeEditorCursorShape(s ui.CursorShape) {
 		ebitenCursorShape = ebiten.CursorShapeText
 	}
 	ebiten.SetCursorShape(ebitenCursorShape)
+}
+
+// Static wrapper over the signal dispatcher
+//
+func AddSignalListener(k SignalKind, l SignalListener) {
+	ed.signals.addListener(k, l)
+}
+
+// Static wrapper over the signal dispatcher
+//
+func FireSignal(k SignalKind, v SignalValue) {
+	ed.signals.dispatch(k, v)
 }
