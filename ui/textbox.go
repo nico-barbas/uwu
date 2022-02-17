@@ -26,15 +26,16 @@ type (
 		// in the off-chance that the edited text
 		// is incredibly long and its size can't be
 		// accounted beforehand
-		Cap           int
-		charBuf       []rune
-		charCount     int
-		lines         []line
-		lineCount     int
-		caret         int
-		lineIndex     int
-		currentLine   *line
-		currentIndent int
+		Cap             int
+		charBuf         []rune
+		charCount       int
+		lines           []line
+		lineCount       int
+		caret           int
+		lineIndex       int
+		currentLine     *line
+		currentIndent   int
+		lineRenderCount int
 
 		activeRect  Rectangle
 		Margin      float64
@@ -123,6 +124,7 @@ func (t *TextBox) init() {
 		X: t.activeRect.X, Y: t.activeRect.Y,
 		Width: textCursorWidth, Height: t.TextSize,
 	}
+	t.lineRenderCount = int(t.activeRect.Height/t.TextSize) + 2
 }
 
 func (t *TextBox) update() {
@@ -210,7 +212,11 @@ func (t *TextBox) draw(buf *renderBuffer) {
 		})
 	}
 
-	for i := 0; i < t.lineCount; i += 1 {
+	lCount := t.lineRenderCount
+	if lCount > t.lineCount {
+		lCount = t.lineCount
+	}
+	for i := 0; i < lCount; i += 1 {
 		line := &t.lines[i]
 		var xptr float64 = 0
 		for j := 0; j < line.count; j += 1 {

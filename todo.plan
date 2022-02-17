@@ -111,7 +111,7 @@
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Multi-tab text editor",
-      "Selected": false,
+      "Selected": true,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 13 2022 19:07:14"
     }, 
@@ -336,11 +336,11 @@
       "BoardIndex": 0,
       "Position.X": 208,
       "Position.Y": 224,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Saving file",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 15 2022 18:43:53"
     }, 
