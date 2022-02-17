@@ -17,6 +17,21 @@ type textEditor struct {
 
 func newTextEditor(parent ui.Handle) textEditor {
 	textEd := textEditor{}
+	tabView := &ui.TabViewer{
+		HeaderBackground: ui.Background{
+			Visible: true,
+			Kind:    ui.BackgroundImageSlice,
+			Clr:     ui.Color{232, 152, 168, 255},
+			Img:     &ed.header,
+			Constr:  ui.Constraint{2, 2, 2, 2},
+		},
+		HeaderHeight: 25,
+		TabFont:      &ed.font,
+		TabTextSize:  12,
+		TabClr:       uwuTextClr,
+	}
+	ui.AddWidget(parent, tabView, ui.FitContainer)
+
 	textEd.textBox = &ui.TextBox{
 		Background: ui.Background{
 			Visible: false,
@@ -60,7 +75,8 @@ func newTextEditor(parent ui.Handle) textEditor {
 		Keyword: uwuKeywordClr,
 		Digit:   uwuDigitClr,
 	})
-	textEd.handle = ui.AddWidget(parent, textEd.textBox, ui.FitContainer)
+	textEd.handle = tabView.AddTab("test.go", textEd.textBox)
+	// textEd.handle = ui.AddWidget(parent, textEd.textBox, ui.FitContainer)
 
 	return textEd
 }
