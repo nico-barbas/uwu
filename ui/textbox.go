@@ -245,22 +245,6 @@ func (t *TextBox) draw(buf *renderBuffer) {
 			})
 			xptr += token.width
 		}
-		// case false:
-		// 	end := line.end
-		// 	text := string(t.charBuf[line.start:end])
-		// 	textEntry := RenderEntry{
-		// 		Kind: RenderText,
-		// 		Rect: Rectangle{
-		// 			X:      line.origin[0],
-		// 			Y:      line.origin[1],
-		// 			Height: t.TextSize,
-		// 		},
-		// 		Clr:  t.TextClr,
-		// 		Font: t.Font,
-		// 		Text: text,
-		// 	}
-		// 	buf.addEntry(textEntry)
-		// }
 		if t.HasRuler {
 
 			lnWidth := t.Font.MeasureText(line.text, t.TextSize)
@@ -336,20 +320,20 @@ func (t *TextBox) LoadBufferData(data []rune) error {
 			current += 1
 			i := current
 
+			t.addLine()
 			t.lineIndex += 1
-			t.lines[t.lineCount] = line{
-				id:        t.lineCount,
-				text:      fmt.Sprint(t.lineCount + 1),
+			t.lines[t.lineIndex] = line{
+				id:        t.lineIndex,
+				text:      fmt.Sprint(t.lineIndex + 1),
 				start:     i,
 				end:       i,
 				indentEnd: i,
 				origin: Point{
-					t.lines[t.lineCount-1].origin[0],
-					t.lines[t.lineCount-1].origin[1] + t.TextSize + t.LinePadding,
+					t.lines[t.lineIndex-1].origin[0],
+					t.lines[t.lineIndex-1].origin[1] + t.TextSize + t.LinePadding,
 				},
 				tokens: make([]token, initialTokenCap),
 			}
-			t.lineCount += 1
 			continue
 		}
 		t.lines[t.lineIndex].end += 1
@@ -444,7 +428,7 @@ func (t *TextBox) insertLine() {
 	t.lexLine(t.currentLine)
 
 	// Move all the line by one to make room for the new line
-	t.lineCount += 1
+	t.addLine()
 	for i := t.lineCount - 1; i >= t.lineIndex+2; i -= 1 {
 		t.lines[i] = t.lines[i-1]
 		t.lines[i].id += 1
@@ -488,6 +472,15 @@ func (t *TextBox) deleteLine() {
 	t.currentLine = &t.lines[t.lineIndex]
 	// t.currentLine.end -= 1
 	t.moveCursorLineEnd()
+}
+
+func (t *TextBox) addLine() {
+	if t.lineCount >= len(t.lines) {
+		newbuf := make([]line, len(t.lines)*2)
+		copy(newbuf[:], t.lines[:len(t.lines)])
+		t.lines = newbuf
+	}
+	t.lineCount += 1
 }
 
 func (t *TextBox) moveCursorUp() {

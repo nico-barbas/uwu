@@ -35,7 +35,7 @@ type winNode struct {
 // Allocate a new Context and return it
 func NewContext() *Context {
 	c := new(Context)
-	c.renderBuf = newRenderBuffer(ctxWindowCap * 10)
+	c.renderBuf = newRenderBuffer(1000)
 	c.freeAllWindows()
 	return c
 }
