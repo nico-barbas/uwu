@@ -6,83 +6,48 @@ import (
 	"io/fs"
 	"os"
 
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/nico-ec/uwu/ui"
 )
 
+const initialAddedBufferCap = 200
+
 type textEditor struct {
-	currentEdit    projectNode
-	textBox        *ui.TextBox
+	currentEdit projectNode
+	tabViewer   *ui.TabViewer
+	// textBox        *ui.TextBox
 	previousLine   int
 	previousColumn int
 }
 
 func newTextEditor(parent ui.Container) textEditor {
-	textEd := textEditor{}
-	tabView := &ui.TabViewer{
-		HeaderBackground: ui.Background{
-			Visible: true,
-			Kind:    ui.BackgroundImageSlice,
-			Clr:     ui.Color{232, 152, 168, 255},
-			Img:     &ed.header,
-			Constr:  ui.Constraint{2, 2, 2, 2},
+	textEd := textEditor{
+		tabViewer: &ui.TabViewer{
+			HeaderBackground: ui.Background{
+				Visible: true,
+				Kind:    ui.BackgroundImageSlice,
+				Clr:     ui.Color{232, 152, 168, 255},
+				Img:     &ed.header,
+				Constr:  ui.Constraint{2, 2, 2, 2},
+			},
+			HeaderHeight: 25,
+			TabFont:      &ed.font,
+			TabTextSize:  12,
+			TabClr:       uwuTextClr,
 		},
-		HeaderHeight: 25,
-		TabFont:      &ed.font,
-		TabTextSize:  12,
-		TabClr:       uwuTextClr,
 	}
-	parent.AddWidget(tabView, ui.FitContainer)
-
-	textEd.textBox = &ui.TextBox{
-		Background: ui.Background{
-			Visible: false,
-		},
-		Cap:                500,
-		Margin:             10,
-		Font:               &ed.font,
-		TextSize:           12,
-		TabSize:            2,
-		AutoIndent:         true,
-		HasRuler:           true,
-		HasSyntaxHighlight: true,
-		ShowCurrentLine:    true,
-	}
-	// Temporary. Those are go keywords
-	// Allow for user to set their prefered
-	// language from a given .toml file
-	textEd.textBox.SetLexKeywords([]string{
-		"type",
-		"struct",
-		"interface",
-		"func",
-		"go",
-		"return",
-		"bool",
-		"uint",
-		"uint8",
-		"uint16",
-		"uint32",
-		"uint64",
-		"int",
-		"int8",
-		"int16",
-		"int32",
-		"int64",
-		"float64",
-		"float32",
-	})
-	textEd.textBox.SetSyntaxColors(ui.ColorStyle{
-		Normal:  uwuTextClr,
-		Keyword: uwuKeywordClr,
-		Digit:   uwuDigitClr,
-	})
-	tabView.AddTab("test.go", textEd.textBox)
+	parent.AddWidget(textEd.tabViewer, ui.FitContainer)
 
 	return textEd
 }
 
 func (t *textEditor) updateTextEditor() {
-	ln, col := t.textBox.CurrentLine(), t.textBox.CurrentColumn()
+	textBox, ok := t.tabViewer.ActiveTab().(*ui.TextBox)
+	if !ok {
+		return
+	}
+	ln, col := textBox.CurrentLine(), textBox.CurrentColumn()
 	switch {
 	case ln != t.previousLine:
 		FireSignal(EditorLineChanged, SignalInt(ln))
@@ -92,21 +57,30 @@ func (t *textEditor) updateTextEditor() {
 		FireSignal(EditorColumnChanged, SignalInt(col))
 		t.previousColumn = col
 	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyS) {
+		t.saveNode()
+	}
 }
 
-func (t *textEditor) saveCurrentNode() {
+func (t *textEditor) saveNode() {
 	if t.currentEdit == nil {
 		return
 	}
+	textBox, ok := t.tabViewer.ActiveTab().(*ui.TextBox)
+	if !ok {
+		return
+	}
+
 	path := t.currentEdit.path()
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fs.ModeExclusive)
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
-	buf := t.textBox.GetCharBuffer()
+	buf := textBox.GetCharBuffer()
 	fmt.Println(buf)
-	_, err = file.WriteString(string(t.textBox.GetCharBuffer()))
+	_, err = file.WriteString(string(textBox.GetCharBuffer()))
 	if err != nil {
 		panic(err)
 	}
@@ -119,5 +93,55 @@ func (t *textEditor) loadNode(node projectNode) {
 	}
 	d := bytes.Runes(data)
 	t.currentEdit = node
-	t.textBox.LoadBufferData(d)
+	name := node.name()
+
+	if !t.tabViewer.ContainsTab(name) {
+		textBox := &ui.TextBox{
+			Background: ui.Background{
+				Visible: false,
+			},
+			Cap:                len(d) + initialAddedBufferCap,
+			Margin:             10,
+			Font:               &ed.font,
+			TextSize:           12,
+			TabSize:            2,
+			AutoIndent:         true,
+			HasRuler:           true,
+			HasSyntaxHighlight: true,
+			ShowCurrentLine:    true,
+		}
+		// Temporary. Those are go keywords
+		// Allow for user to set their prefered
+		// language from a given .toml file
+		textBox.SetLexKeywords([]string{
+			"type",
+			"struct",
+			"interface",
+			"func",
+			"go",
+			"return",
+			"bool",
+			"uint",
+			"uint8",
+			"uint16",
+			"uint32",
+			"uint64",
+			"int",
+			"int8",
+			"int16",
+			"int32",
+			"int64",
+			"float64",
+			"float32",
+		})
+		textBox.SetSyntaxColors(ui.ColorStyle{
+			Normal:  uwuTextClr,
+			Keyword: uwuKeywordClr,
+			Digit:   uwuDigitClr,
+		})
+		t.tabViewer.AddTab(name, textBox)
+		textBox.LoadBufferData(d)
+	} else {
+		t.tabViewer.SetActiveTab(name)
+	}
 }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/nico-ec/uwu/ui"
 )
@@ -61,9 +60,6 @@ func (ed *Editor) Update() error {
 	})
 
 	ed.textEd.updateTextEditor()
-	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		ed.textEd.saveCurrentNode()
-	}
 	return nil
 }
 

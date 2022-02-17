@@ -46,8 +46,18 @@ func (t *TabViewer) init() {
 
 func (t *TabViewer) update() {
 	// check if a new tab has been selected
+	mPos := mousePosition()
+	if t.headerRect.pointInBounds(mPos) && isMouseJustPressed() {
+		relPos := mPos[0] - t.rect.X
+		tabIndex := int(relPos / tabWidth)
+		if tabIndex >= 0 && tabIndex < t.tabCount {
+			t.currentTab = t.tabs[tabIndex]
+		}
+	}
 
-	t.currentTab.widget.update()
+	if t.currentTab.widget != nil {
+		t.currentTab.widget.update()
+	}
 }
 
 func (t *TabViewer) draw(buf *renderBuffer) {
@@ -75,7 +85,9 @@ func (t *TabViewer) draw(buf *renderBuffer) {
 		})
 
 	}
-	t.currentTab.widget.draw(buf)
+	if t.currentTab.widget != nil {
+		t.currentTab.widget.draw(buf)
+	}
 }
 
 // Should the newly added tab be set as the active one?
@@ -86,7 +98,7 @@ func (t *TabViewer) AddTab(name string, w Widget) {
 	t.tabs[t.tabCount] = tab{
 		name: name,
 		rect: Rectangle{
-			X: t.rect.X, Y: t.rect.Y,
+			X: t.rect.X + float64(t.tabCount)*tabWidth, Y: t.rect.Y,
 			Width: tabWidth, Height: t.HeaderHeight,
 		},
 		widget: w,
@@ -94,4 +106,28 @@ func (t *TabViewer) AddTab(name string, w Widget) {
 	t.tabCount += 1
 	t.currentTab = t.tabs[t.tabCount-1]
 	w.init()
+}
+
+// Silently ignore if no tabs with the given name for now
+func (t *TabViewer) SetActiveTab(name string) {
+	for i := 0; i < t.tabCount; i += 1 {
+		tab := t.tabs[i]
+		if tab.name == name {
+			t.currentTab = tab
+		}
+	}
+}
+
+func (t *TabViewer) ActiveTab() Widget {
+	return t.currentTab.widget
+}
+
+func (t *TabViewer) ContainsTab(name string) bool {
+	for i := 0; i < t.tabCount; i += 1 {
+		tab := t.tabs[i]
+		if tab.name == name {
+			return true
+		}
+	}
+	return false
 }
