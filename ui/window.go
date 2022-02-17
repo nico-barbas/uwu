@@ -3,7 +3,7 @@ package ui
 import "log"
 
 type Window struct {
-	handle     Handle
+	handle     WinHandle
 	Active     bool
 	Rect       Rectangle
 	activeRect Rectangle
@@ -29,10 +29,6 @@ type Window struct {
 	HasCloseBtn  bool
 	CloseBtn     Background
 	closeBtnRect Rectangle
-}
-
-func (win *Window) parent() Node {
-	return nil
 }
 
 func (win *Window) initWindow() {
@@ -140,4 +136,25 @@ func (win *Window) draw(buf *renderBuffer) {
 			Clr: win.BorderColor,
 		})
 	}
+}
+
+func (w *Window) AddWidget(wgt Widget, length int) {
+	w.widgets.addWidget(wgt, w.activeRect, length)
+}
+
+func (w *Window) RemainingLength() int {
+	return w.widgets.getRemainingLen(w.activeRect)
+}
+
+type WinHandle struct {
+	id  int
+	gen uint
+}
+
+func (h WinHandle) AddWidget(wgt Widget, length int) {
+	getWindow(h).AddWidget(wgt, length)
+}
+
+func (h WinHandle) RemainingLength() int {
+	return getWindow(h).RemainingLength()
 }

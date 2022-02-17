@@ -52,7 +52,7 @@ func (c *Context) SetCursorShapeCallback(cb func(CursorShape)) {
 // to the current context.
 //
 // WARNING: A context must be set to current before trying to add windows
-func AddWindow(w Window) Handle {
+func AddWindow(w Window) WinHandle {
 	// Pop the head of the list
 	node := ctx.head
 	if node == nil {
@@ -61,10 +61,9 @@ func AddWindow(w Window) Handle {
 	}
 	// Set the next node at the top of the list
 	ctx.head = node.next
-	handle := Handle{
-		node: node.win.handle.node,
-		id:   node.win.handle.id,
-		gen:  node.win.handle.gen + 1,
+	handle := WinHandle{
+		id:  node.win.handle.id,
+		gen: node.win.handle.gen + 1,
 	}
 	node.win = w
 	node.win.handle = handle
@@ -82,14 +81,7 @@ func AddWindow(w Window) Handle {
 // Delete a Window with the given handle from the current context.
 //
 // Note: Also removes all the child nodes
-func DeleteWindow(h Handle) {
-	// Wrong handle kind. Mean that it isn't a root Node(a Window)
-	if h.node.parent() != nil {
-		log.SetPrefix("[UI Error]: ")
-		log.Println("Given Handle does not refer to a Window")
-		return
-	}
-
+func DeleteWindow(h WinHandle) {
 	// Push the node on top of the free list
 	node := &ctx.winBuf[h.id]
 	if node.win.handle.gen != h.gen {
@@ -108,50 +100,12 @@ func DeleteWindow(h Handle) {
 	}
 }
 
-// Try to add the given widget as a child of the Node (referenced by the Handle)
-// Can fail if the Node is not a valid receiver.
-//
-// Valid receivers are Windows and Layouts.
-func AddWidget(parentHandle Handle, w Widget, len int) Handle {
-	var handle Handle
-	switch p := parentHandle.node.(type) {
-	case *Window:
-		handle = p.widgets.addWidget(p, p.activeRect, w, len)
-	case *Layout:
-		handle = p.widgets.addWidget(p, p.rect, w, len)
-	default:
-		log.SetPrefix("[UI Error]: ")
-		log.Println("Given UI Node is not a valid container")
+func getWindow(h WinHandle) *Window {
+	node := &ctx.winBuf[h.id]
+	if node.win.handle.gen != h.gen {
+		return nil
 	}
-	return handle
-}
-
-// Super dodgy KEKL
-// No generation validation or use-after-free prevention
-func GetWidget(handle Handle) Widget {
-	var widget Widget
-	switch w := handle.node.(type) {
-	case *Window:
-		log.SetPrefix("[UI Error]: ")
-		log.Println("Given UI Handle does not point to a valid Widget")
-	case Widget:
-		widget = w
-	}
-	return widget
-}
-
-func ContainerRemainingLength(hdl Handle) int {
-	result := -1
-	switch c := hdl.node.(type) {
-	case *Window:
-		result = c.widgets.getRemainingLen(c.activeRect)
-	case *Layout:
-		result = c.widgets.getRemainingLen(c.rect)
-	default:
-		log.SetPrefix("[UI Error]: ")
-		log.Println("Given UI Node is not a valid container")
-	}
-	return result
+	return &node.win
 }
 
 // Function used internally!
@@ -162,7 +116,7 @@ func (c *Context) freeAllWindows() {
 		node := &c.winBuf[i]
 		node.next = c.head
 		node.win = Window{
-			handle: Handle{node: &node.win, id: i, gen: 0},
+			handle: WinHandle{id: i, gen: 0},
 		}
 		c.head = node
 	}
@@ -201,7 +155,6 @@ func (c *Context) UpdateUI(data Input) {
 	for i := 0; i < ctx.count; i += 1 {
 		c.actives[i].update()
 	}
-	// fmt.Println(c.input.pressedChars[:c.input.pressedCharsCount])
 	c.input.pressedCharsCount = 0
 }
 

@@ -12,7 +12,7 @@ type treeview struct {
 	list *ui.List
 }
 
-func newTreeview(edParent ui.Handle, sepImg *Image, font *Font) treeview {
+func newTreeview(parent ui.Container, sepImg *Image, font *Font) treeview {
 	treeview := treeview{}
 	treeview.list = &ui.List{
 		Background: ui.Background{
@@ -33,7 +33,7 @@ func newTreeview(edParent ui.Handle, sepImg *Image, font *Font) treeview {
 		TextClr:    uwuTextClr,
 		IndentSize: 10,
 	}
-	ui.AddWidget(edParent, treeview.list, treeviewWidth)
+	parent.AddWidget(treeview.list, treeviewWidth)
 
 	return treeview
 }

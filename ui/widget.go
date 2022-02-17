@@ -1,9 +1,6 @@
 package ui
 
 type Widget interface {
-	Node
-	setHandle(h Handle)
-	setParent(n Node)
 	setRect(r Rectangle)
 	moveBy(offset Point)
 	init()
@@ -15,21 +12,7 @@ type Widget interface {
 // to avoid having to redeclare all the boilerplate fields and
 // methods
 type widgetRoot struct {
-	handle  Handle
-	wParent Node
-	rect    Rectangle
-}
-
-func (w *widgetRoot) parent() Node {
-	return w.wParent
-}
-
-func (w *widgetRoot) setHandle(h Handle) {
-	w.handle = h
-}
-
-func (w *widgetRoot) setParent(n Node) {
-	w.wParent = n
+	rect Rectangle
 }
 
 func (w *widgetRoot) setRect(r Rectangle) {

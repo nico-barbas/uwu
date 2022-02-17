@@ -22,7 +22,7 @@ type Button struct {
 }
 
 type ButtonReceiver interface {
-	OnButtonPressed(h Handle)
+	OnButtonPressed(w Widget)
 }
 
 func (btn *Button) init() {
@@ -37,7 +37,7 @@ func (btn *Button) update() {
 		btn.Background.Clr = btn.HighlightClr
 		if released {
 			if btn.Receiver != nil {
-				btn.Receiver.OnButtonPressed(btn.handle)
+				btn.Receiver.OnButtonPressed(btn)
 			} else {
 				log.SetPrefix("[UI Debug]: ")
 				log.Println("No Receiver attached to this button")

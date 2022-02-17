@@ -22,7 +22,7 @@ type Editor struct {
 	header Image
 	layout Image
 
-	window   ui.Handle
+	window   ui.WinHandle
 	treeView treeview
 	textEd   textEditor
 
@@ -252,8 +252,9 @@ func NewEditor() *Editor {
 		},
 	)
 
-	rem := ui.ContainerRemainingLength(ed.window)
-	lyt := ui.AddWidget(ed.window, &ui.Layout{
+	// rem := ui.ContainerRemainingLength(ed.window)
+	rem := ed.window.RemainingLength()
+	lyt := &ui.Layout{
 		Background: ui.Background{
 			Visible: false,
 		},
@@ -262,7 +263,8 @@ func NewEditor() *Editor {
 			Padding:  0,
 			Margin:   ui.Point{0, 0},
 		},
-	}, rem-20)
+	}
+	ed.window.AddWidget(lyt, rem-20)
 
 	// Project and Treeview display
 	ed.project = openProject(".")
@@ -273,7 +275,7 @@ func NewEditor() *Editor {
 	ed.textEd = newTextEditor(lyt)
 
 	// Status bar
-	ed.statusbar = newStatusBar(ed.window, ed.textEd.handle, &ed.font)
+	ed.statusbar = newStatusBar(ed.window, &ed.font)
 
 	return ed
 }

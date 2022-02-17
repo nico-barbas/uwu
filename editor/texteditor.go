@@ -11,11 +11,11 @@ import (
 
 type textEditor struct {
 	currentEdit projectNode
-	handle      ui.Handle
-	textBox     *ui.TextBox
+	// handle      ui.Handle
+	textBox *ui.TextBox
 }
 
-func newTextEditor(parent ui.Handle) textEditor {
+func newTextEditor(parent ui.Container) textEditor {
 	textEd := textEditor{}
 	tabView := &ui.TabViewer{
 		HeaderBackground: ui.Background{
@@ -30,7 +30,7 @@ func newTextEditor(parent ui.Handle) textEditor {
 		TabTextSize:  12,
 		TabClr:       uwuTextClr,
 	}
-	ui.AddWidget(parent, tabView, ui.FitContainer)
+	parent.AddWidget(tabView, ui.FitContainer)
 
 	textEd.textBox = &ui.TextBox{
 		Background: ui.Background{
@@ -75,7 +75,7 @@ func newTextEditor(parent ui.Handle) textEditor {
 		Keyword: uwuKeywordClr,
 		Digit:   uwuDigitClr,
 	})
-	textEd.handle = tabView.AddTab("test.go", textEd.textBox)
+	tabView.AddTab("test.go", textEd.textBox)
 	// textEd.handle = ui.AddWidget(parent, textEd.textBox, ui.FitContainer)
 
 	return textEd

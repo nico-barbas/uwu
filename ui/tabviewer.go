@@ -79,12 +79,7 @@ func (t *TabViewer) draw(buf *renderBuffer) {
 }
 
 // Should the newly added tab be set as the active one?
-func (t *TabViewer) AddTab(name string, w Widget) Handle {
-	handle := Handle{
-		node: w, id: t.tabCount, gen: t.tabGens[t.tabCount],
-	}
-	w.setHandle(handle)
-	w.setParent(t)
+func (t *TabViewer) AddTab(name string, w Widget) {
 	w.setRect(t.tabRect)
 
 	t.tabGens[t.tabCount] += 1
@@ -99,5 +94,4 @@ func (t *TabViewer) AddTab(name string, w Widget) Handle {
 	t.tabCount += 1
 	t.currentTab = t.tabs[t.tabCount-1]
 	w.init()
-	return handle
 }

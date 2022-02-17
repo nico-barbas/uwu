@@ -21,3 +21,11 @@ func (l *Layout) draw(buf *renderBuffer) {
 
 	l.widgets.drawWidgets(buf)
 }
+
+func (l *Layout) AddWidget(wgt Widget, length int) {
+	l.widgets.addWidget(wgt, l.rect, length)
+}
+
+func (l *Layout) RemainingLength() int {
+	return l.widgets.getRemainingLen(l.rect)
+}

@@ -156,7 +156,7 @@ func (s *SubList) AddItem(i ListNode, indentSize float64, lineSize float64) {
 		})
 		i.setHeight(lineSize)
 	} else {
-		log.Printf("List %s already has a child with name %s", s.Name, name)
+		log.Printf("List %s already has a child with name %s", s.Name(), name)
 	}
 }
 

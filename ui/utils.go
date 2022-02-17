@@ -5,14 +5,10 @@ import (
 	"sync/atomic"
 )
 
-type Handle struct {
-	node Node
-	id   int
-	gen  uint
-}
-
-type Node interface {
-	parent() Node
+type Container interface {
+	AddWidget(w Widget, length int)
+	// RemoveWidget(w Widget)
+	RemainingLength() int
 }
 
 // Those are types used to keep the library
@@ -31,7 +27,6 @@ type (
 	}
 
 	Canvas interface {
-		Draw() Image
 	}
 )
 

@@ -20,11 +20,8 @@ func (w *WidgetList) initList(style Style) {
 	}
 }
 
-func (w *WidgetList) addWidget(parent Node, pRect Rectangle, wgt Widget, l int) Handle {
+func (w *WidgetList) addWidget(wgt Widget, pRect Rectangle, l int) {
 	len := float64(l)
-	handle := Handle{node: wgt, id: w.count, gen: w.gens[w.count]}
-	wgt.setHandle(handle)
-	wgt.setParent(parent)
 
 	rect := Rectangle{}
 	switch w.style.Ordering {
@@ -51,7 +48,6 @@ func (w *WidgetList) addWidget(parent Node, pRect Rectangle, wgt Widget, l int) 
 	w.count += 1
 	w.ptr += len + w.style.Padding
 	w.widgets[w.count-1].init()
-	return handle
 }
 
 func (w *WidgetList) updateWidgets() {
