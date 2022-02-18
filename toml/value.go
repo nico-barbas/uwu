@@ -20,11 +20,11 @@ type (
 	Table map[string]Value
 )
 
-func (nv Number) toString() string { return "Number" }
+func (n Number) toString() string { return "Number" }
 
-func (bv Boolean) toString() string { return "Boolean" }
+func (b Boolean) toString() string { return "Boolean" }
 
-func (sv String) toString() string { return "String" }
+func (s String) toString() string { return "String" }
 
 func (a *Array) toString() string { return "Array" }
 
