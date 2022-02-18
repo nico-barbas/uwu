@@ -254,18 +254,20 @@ func (s *SubList) selectNode(at Point) ListNode {
 		return s
 	}
 	var selected ListNode
-	for i := 0; i < s.count; i += 1 {
-		item := s.items[i]
-		switch i := item.(type) {
-		case *SubList:
-			selected = i.selectNode(at)
-		case *ListItem:
-			if at[1] >= i.origin[1] && at[1] < i.origin[1]+i.height {
-				selected = i
+	if !s.Collapsed {
+		for i := 0; i < s.count; i += 1 {
+			item := s.items[i]
+			switch i := item.(type) {
+			case *SubList:
+				selected = i.selectNode(at)
+			case *ListItem:
+				if at[1] >= i.origin[1] && at[1] < i.origin[1]+i.height {
+					selected = i
+				}
 			}
-		}
-		if selected != nil {
-			break
+			if selected != nil {
+				break
+			}
 		}
 	}
 	return selected
