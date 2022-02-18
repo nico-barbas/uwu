@@ -32,6 +32,7 @@ type (
 
 	SubList struct {
 		ItemName   string
+		Collapsed  bool
 		nameHeight float64
 		items      []ListNode
 		count      int
@@ -89,11 +90,17 @@ func (l *List) update() {
 			l.cursorVisible = true
 			l.cursorRect.Y = l.selectedNode.getOrigin()[1]
 			if isMouseJustPressed() {
-				if l.Receiver != nil {
-					l.Receiver.OnItemSelected(l.selectedNode)
-				} else {
-					log.SetPrefix("[UI Debug]: ")
-					log.Println("No receiver attached to this list")
+				switch s := l.selectedNode.(type) {
+				case *SubList:
+					s.Collapsed = !s.Collapsed
+					l.Root.orderItems(l.TextSize)
+				case *ListItem:
+					if l.Receiver != nil {
+						l.Receiver.OnItemSelected(l.selectedNode)
+					} else {
+						log.SetPrefix("[UI Debug]: ")
+						log.Println("No receiver attached to this list")
+					}
 				}
 			}
 		} else {
@@ -127,8 +134,9 @@ func (l *List) SortList() {
 
 func NewSubList(name string) SubList {
 	return SubList{
-		ItemName: name,
-		items:    make([]ListNode, subListInitialCap),
+		ItemName:  name,
+		Collapsed: false,
+		items:     make([]ListNode, subListInitialCap),
 	}
 }
 
@@ -165,10 +173,33 @@ func (s *SubList) Name() string {
 }
 
 func (s *SubList) sort(lineSize float64) {
+	sortFolderFn := func(i, j int) bool {
+		_, iFolder := s.items[i].(*SubList)
+		_, jFolder := s.items[j].(*SubList)
+		return iFolder && !jFolder
+	}
 	sortFn := func(i, j int) bool {
 		return s.items[i].Name() < s.items[j].Name()
 	}
-	sort.SliceStable(s.items[:s.count], sortFn)
+	sort.SliceStable(s.items[:s.count], sortFolderFn)
+	maxFolderIndex := 0
+	for i := 0; i < s.count; i += 1 {
+		_, isFolder := s.items[i].(*SubList)
+		if !isFolder {
+			break
+		}
+		maxFolderIndex += 1
+	}
+
+	sort.SliceStable(s.items[:maxFolderIndex], sortFn)
+	sort.SliceStable(s.items[maxFolderIndex:s.count], sortFn)
+	s.orderItems(lineSize)
+}
+
+func (s *SubList) orderItems(lineSize float64) {
+	if s.Collapsed {
+		return
+	}
 	yPtr := s.origin[1] + lineSize
 	for i := 0; i < s.count; i += 1 {
 		item := s.items[i]
@@ -198,21 +229,23 @@ func (s *SubList) draw(buf *renderBuffer, f Font, size float64, clr Color) float
 		Text: s.ItemName,
 	})
 	yPtr := size
-	for i := 0; i < s.count; i += 1 {
-		item := s.items[i]
-		h := item.draw(buf, f, size, clr)
-		yPtr += h
+	if !s.Collapsed {
+		for i := 0; i < s.count; i += 1 {
+			item := s.items[i]
+			h := item.draw(buf, f, size, clr)
+			yPtr += h
+		}
+		buf.addEntry(RenderEntry{
+			Kind: RenderRectangle,
+			Rect: Rectangle{
+				X:      s.origin[0],
+				Y:      s.origin[1] + size,
+				Width:  1,
+				Height: yPtr - size,
+			},
+			Clr: clr,
+		})
 	}
-	buf.addEntry(RenderEntry{
-		Kind: RenderRectangle,
-		Rect: Rectangle{
-			X:      s.origin[0],
-			Y:      s.origin[1] + size,
-			Width:  1,
-			Height: yPtr - size,
-		},
-		Clr: clr,
-	})
 	return yPtr
 }
 
@@ -248,8 +281,10 @@ func (s *SubList) setOrigin(p Point) {
 
 func (s *SubList) getHeight() float64 {
 	height := s.nameHeight
-	for i := 0; i < s.count; i += 1 {
-		height += s.items[i].getHeight()
+	if !s.Collapsed {
+		for i := 0; i < s.count; i += 1 {
+			height += s.items[i].getHeight()
+		}
 	}
 	return height
 }

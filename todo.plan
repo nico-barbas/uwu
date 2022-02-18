@@ -4,8 +4,8 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -448.68109130859375,
-  "Pan.Y": -287.1087646484375,
+  "Pan.X": -495.65869140625,
+  "Pan.Y": -305.5195007324219,
   "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
@@ -107,11 +107,11 @@
       "BoardIndex": 0,
       "Position.X": 192,
       "Position.Y": 288,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Multi-tab text editor",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 13 2022 19:07:14"
     }, 
@@ -202,7 +202,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 400,
+      "Position.Y": 416,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -227,7 +227,7 @@
       "BoardIndex": 0,
       "Position.X": 208,
       "Position.Y": 240,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Collapsable sub-folders",
@@ -323,8 +323,8 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 416,
-      "Checkbox.Checked": false,
+      "Position.Y": 432,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Refactor tabs to use \\t instead of multiple spaces (maybe?)",
@@ -367,6 +367,30 @@
       "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 15 2022 19:45:16"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 224,
+      "Position.Y": 448,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Give the option to either use tabs or space",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 11:28:06"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 208,
+      "Position.Y": 400,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "TOML parser",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 11:28:28"
     }
   ]
 }
