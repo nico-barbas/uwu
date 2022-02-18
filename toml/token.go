@@ -164,8 +164,12 @@ func (l *lexer) lexNumber() {
 	}
 }
 
-func (l *lexer) remaining() int {
-	return len(l.source) - l.current
+// func (l *lexer) remaining() int {
+// 	return len(l.source) - l.current
+// }
+
+func (t token) isValueKind() bool {
+	return t.kind == tokenNumber || t.kind == tokenFalse || t.kind == tokenTrue || t.kind == tokenString
 }
 
 func isLetter(c byte) bool {

@@ -4,8 +4,8 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -495.65869140625,
-  "Pan.Y": -305.5195007324219,
+  "Pan.X": -588.829345703125,
+  "Pan.Y": -286.259765625,
   "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
@@ -391,6 +391,42 @@
       "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 18 2022 11:28:28"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 656,
+      "Position.Y": 336,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "OPTIMISATION",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 11:43:28"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 672,
+      "Position.Y": 352,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Implement dirty flag",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 11:43:44"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 672,
+      "Position.Y": 368,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Implement Canvas to let the user cache the rendering results",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 11:44:00"
     }
   ]
 }
