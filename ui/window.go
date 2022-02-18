@@ -4,6 +4,7 @@ import "log"
 
 type Window struct {
 	handle     WinHandle
+	zIndex     int
 	Active     bool
 	Rect       Rectangle
 	activeRect Rectangle
@@ -71,7 +72,7 @@ func (win *Window) initWindow() {
 }
 
 func (win *Window) update() {
-	win.widgets.updateWidgets()
+	win.widgets.updateWidgets(win.zIndex == 0)
 }
 
 func (win *Window) draw(buf *renderBuffer) {

@@ -11,8 +11,8 @@ func (l *Layout) init() {
 	l.widgets.initList(l.Style)
 }
 
-func (l *Layout) update() {
-	l.widgets.updateWidgets()
+func (l *Layout) update(parentFocused bool) {
+	l.widgets.updateWidgets(parentFocused)
 }
 
 func (l *Layout) draw(buf *renderBuffer) {

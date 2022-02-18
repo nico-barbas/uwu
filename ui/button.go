@@ -29,7 +29,7 @@ func (btn *Button) init() {
 	btn.Background.Clr = btn.Clr
 }
 
-func (btn *Button) update() {
+func (btn *Button) update(parentFocused bool) {
 	mPos := mousePosition()
 	mLeft := isMousePressed()
 	released := isMouseJustReleased()

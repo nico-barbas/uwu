@@ -50,9 +50,9 @@ func (w *WidgetList) addWidget(wgt Widget, pRect Rectangle, l int) {
 	w.widgets[w.count-1].init()
 }
 
-func (w *WidgetList) updateWidgets() {
+func (w *WidgetList) updateWidgets(parentFocused bool) {
 	for i := 0; i < w.count; i += 1 {
-		w.widgets[i].update()
+		w.widgets[i].update(parentFocused)
 	}
 }
 

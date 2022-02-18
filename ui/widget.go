@@ -4,7 +4,7 @@ type Widget interface {
 	setRect(r Rectangle)
 	moveBy(offset Point)
 	init()
-	update()
+	update(parentFocused bool)
 	draw(buf *renderBuffer)
 }
 
@@ -26,9 +26,9 @@ func (w *widgetRoot) moveBy(offset Point) {
 
 // "Virtual" methods to avoid having to redeclare it
 // for every widget implementation
-func (w *widgetRoot) init()                  {}
-func (w *widgetRoot) update()                {}
-func (w *widgetRoot) draw(buf *renderBuffer) {}
+func (w *widgetRoot) init()                     {}
+func (w *widgetRoot) update(parentFocused bool) {}
+func (w *widgetRoot) draw(buf *renderBuffer)    {}
 
 //
 // Simple Widget used for debugging purposes

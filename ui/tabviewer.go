@@ -44,7 +44,7 @@ func (t *TabViewer) init() {
 	t.tabGens = make([]uint, tabViewerInitialCap)
 }
 
-func (t *TabViewer) update() {
+func (t *TabViewer) update(parentFocused bool) {
 	// check if a new tab has been selected
 	mPos := mousePosition()
 	if t.headerRect.pointInBounds(mPos) && isMouseJustPressed() {
@@ -56,7 +56,7 @@ func (t *TabViewer) update() {
 	}
 
 	if t.currentTab.widget != nil {
-		t.currentTab.widget.update()
+		t.currentTab.widget.update(parentFocused)
 	}
 }
 

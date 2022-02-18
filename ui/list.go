@@ -82,7 +82,7 @@ func (l *List) init() {
 	}
 }
 
-func (l *List) update() {
+func (l *List) update(parentFocused bool) {
 	mPos := mousePosition()
 	if l.activeRect.pointInBounds(mPos) {
 		l.selectedNode = l.Root.selectNode(mPos)

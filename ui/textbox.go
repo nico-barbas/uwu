@@ -127,7 +127,10 @@ func (t *TextBox) init() {
 	t.lineRenderCount = int(t.activeRect.Height/t.TextSize) + 2
 }
 
-func (t *TextBox) update() {
+func (t *TextBox) update(parentFocused bool) {
+	if !parentFocused {
+		return
+	}
 	mPos := mousePosition()
 	inBoxBounds := t.activeRect.pointInBounds(mPos)
 	if inBoxBounds {
@@ -138,7 +141,7 @@ func (t *TextBox) update() {
 	if isMouseJustPressed() {
 		if inBoxBounds {
 			if !t.focused {
-				t.focused = true
+				t.focused = parentFocused
 			}
 			t.moveCursorToMouse(mPos)
 		} else {

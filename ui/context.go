@@ -13,14 +13,13 @@ const ctxWindowCap = 50
 var ctx *Context
 
 type Context struct {
-	renderBuf renderBuffer
-	winBuf    [ctxWindowCap]winNode
-	head      *winNode
-	actives   [ctxWindowCap]*Window
-	indexed   [ctxWindowCap]*Window
+	renderBuf    renderBuffer
+	winBuf       [ctxWindowCap]winNode
+	head         *winNode
+	actives      [ctxWindowCap]*Window
 	currentFocus int
-	count     int
-	input     inputData
+	count        int
+	input        inputData
 
 	cursorShapeCallback func(s CursorShape)
 }
@@ -75,6 +74,7 @@ func AddWindow(w Window) WinHandle {
 	// Push the new window onto the active
 	// window array and initialize it
 	ctx.actives[ctx.count] = &node.win
+	FocusWindow(handle)
 	ctx.actives[ctx.count].initWindow()
 	ctx.count += 1
 	return handle
@@ -108,6 +108,17 @@ func getWindow(h WinHandle) *Window {
 		return nil
 	}
 	return &node.win
+}
+
+func FocusWindow(h WinHandle) {
+	for i := 0; i < ctx.count; i += 1 {
+		win := ctx.actives[i]
+		if win.handle.id == h.id && win.handle.gen == h.gen {
+			win.zIndex = 0
+		} else {
+			win.zIndex += 1
+		}
+	}
 }
 
 // Function used internally!
@@ -153,12 +164,6 @@ func (c *Context) UpdateUI(data Input) {
 				c.input.keyCounts[i] = 0
 			}
 		}
-	}
-	if isMouseJustPressed() {
-		for i := 0; i < ctx.count; i += 1 {
-			if 
-		}
-		// sort
 	}
 	for i := 0; i < ctx.count; i += 1 {
 		c.actives[i].update()
