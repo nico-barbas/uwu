@@ -17,6 +17,8 @@ type Context struct {
 	winBuf    [ctxWindowCap]winNode
 	head      *winNode
 	actives   [ctxWindowCap]*Window
+	indexed   [ctxWindowCap]*Window
+	currentFocus int
 	count     int
 	input     inputData
 
@@ -151,6 +153,12 @@ func (c *Context) UpdateUI(data Input) {
 				c.input.keyCounts[i] = 0
 			}
 		}
+	}
+	if isMouseJustPressed() {
+		for i := 0; i < ctx.count; i += 1 {
+			if 
+		}
+		// sort
 	}
 	for i := 0; i < ctx.count; i += 1 {
 		c.actives[i].update()

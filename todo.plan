@@ -4,9 +4,9 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -588.829345703125,
-  "Pan.Y": -286.259765625,
-  "ZoomLevel": 4,
+  "Pan.X": -457.200439453125,
+  "Pan.Y": -363.13043212890625,
+  "ZoomLevel": 3,
   "TaskTransparency": 5,
   "OutlineTasks": true,
   "BracketSubtasks": true,
@@ -46,7 +46,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 176,
+      "Position.Y": 192,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -58,7 +58,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 208,
-      "Position.Y": 192,
+      "Position.Y": 208,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -82,7 +82,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 208,
-      "Position.Y": 272,
+      "Position.Y": 288,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -94,7 +94,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 208,
-      "Position.Y": 208,
+      "Position.Y": 224,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -106,7 +106,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 288,
+      "Position.Y": 304,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -130,7 +130,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 304,
+      "Position.Y": 320,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -142,7 +142,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 320,
+      "Position.Y": 336,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -154,7 +154,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 336,
+      "Position.Y": 352,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -166,7 +166,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 352,
+      "Position.Y": 368,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -178,7 +178,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 368,
+      "Position.Y": 384,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -190,7 +190,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 384,
+      "Position.Y": 400,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -202,7 +202,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 416,
+      "Position.Y": 432,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -214,7 +214,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 208,
-      "Position.Y": 256,
+      "Position.Y": 272,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -226,7 +226,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 208,
-      "Position.Y": 240,
+      "Position.Y": 256,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -261,8 +261,8 @@
     }, 
     {
       "BoardIndex": 0,
-      "Position.X": 464,
-      "Position.Y": 48,
+      "Position.X": 400,
+      "Position.Y": 32,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -273,8 +273,8 @@
     }, 
     {
       "BoardIndex": 0,
-      "Position.X": 480,
-      "Position.Y": 64,
+      "Position.X": 416,
+      "Position.Y": 48,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -297,8 +297,8 @@
     }, 
     {
       "BoardIndex": 0,
-      "Position.X": 480,
-      "Position.Y": 80,
+      "Position.X": 416,
+      "Position.Y": 64,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -309,8 +309,8 @@
     }, 
     {
       "BoardIndex": 0,
-      "Position.X": 480,
-      "Position.Y": 96,
+      "Position.X": 416,
+      "Position.Y": 80,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -323,7 +323,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 192,
-      "Position.Y": 432,
+      "Position.Y": 448,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -335,7 +335,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 208,
-      "Position.Y": 224,
+      "Position.Y": 240,
       "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -371,7 +371,7 @@
     {
       "BoardIndex": 0,
       "Position.X": 224,
-      "Position.Y": 448,
+      "Position.Y": 464,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -383,8 +383,8 @@
     {
       "BoardIndex": 0,
       "Position.X": 208,
-      "Position.Y": 400,
-      "Checkbox.Checked": false,
+      "Position.Y": 416,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "TOML parser",
@@ -394,8 +394,8 @@
     }, 
     {
       "BoardIndex": 0,
-      "Position.X": 656,
-      "Position.Y": 336,
+      "Position.X": 400,
+      "Position.Y": -48,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -406,8 +406,8 @@
     }, 
     {
       "BoardIndex": 0,
-      "Position.X": 672,
-      "Position.Y": 352,
+      "Position.X": 416,
+      "Position.Y": -32,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -418,8 +418,8 @@
     }, 
     {
       "BoardIndex": 0,
-      "Position.X": 672,
-      "Position.Y": 368,
+      "Position.X": 416,
+      "Position.Y": -16,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
@@ -427,6 +427,54 @@
       "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 18 2022 11:44:00"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 416,
+      "Position.Y": 96,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Auto indent does not work on opened file",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 19:44:51"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 672,
+      "Position.Y": 272,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Serialize and deserialize theme files",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 19:45:35"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 672,
+      "Position.Y": 288,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Load theme file at start-up",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 19:46:11"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 192,
+      "Position.Y": 176,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Z indexing",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 18 2022 19:50:52"
     }
   ]
 }
