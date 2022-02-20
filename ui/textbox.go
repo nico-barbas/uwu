@@ -550,6 +550,12 @@ func (t *TextBox) moveCursorLeft() {
 
 func (t *TextBox) moveCursorToNextWord() {
 	if t.caret+1 <= t.charCount {
+		if t.caret+1 > t.currentLine.end {
+			t.lineIndex += 1
+			t.currentLine = &t.lines[t.lineIndex]
+			t.moveCursorLineStart()
+			return
+		}
 		c := t.charBuf[t.caret]
 		if isTerminalSymbol(c) {
 			t.cursor.X += t.Font.GlyphAdvance(c, t.TextSize)
@@ -829,5 +835,14 @@ func isLetter(r rune) bool {
 }
 
 func isTerminalSymbol(r rune) bool {
-	return r == ' ' || r == '.' || r == '/' || r == '{' || r == '[' || r == '('
+	termSymbols := []rune{
+		' ', '.', '/', '{', '[', '(',
+		'\t', '\r', '\n',
+	}
+	for _, term := range termSymbols {
+		if r == term {
+			return true
+		}
+	}
+	return false
 }
