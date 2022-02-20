@@ -149,6 +149,11 @@ func (t *TextBox) update(parentFocused bool) {
 		}
 	}
 	if t.focused {
+		if isAnyKeyPressed([]key{keyUp, keyDown, keyRight, keyLeft}) {
+			t.showCursor = true
+			t.blinkTimer = 0
+		}
+
 		keys := pressedChars()
 		if len(keys) > 0 {
 			for _, k := range keys {

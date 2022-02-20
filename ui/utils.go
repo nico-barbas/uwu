@@ -262,6 +262,15 @@ func isKeyPressed(k key) bool {
 	return ctx.input.keys[k]
 }
 
+func isAnyKeyPressed(keys []key) bool {
+	for _, k := range keys {
+		if isKeyPressed(k) {
+			return true
+		}
+	}
+	return false
+}
+
 func isKeyRepeated(k key) bool {
 	const (
 		delay    = 15
