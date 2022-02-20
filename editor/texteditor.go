@@ -22,19 +22,21 @@ type textEditor struct {
 }
 
 func newTextEditor(parent ui.Container) textEditor {
+	theme := getTheme()
 	textEd := textEditor{
 		tabViewer: &ui.TabViewer{
 			HeaderBackground: ui.Background{
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
-				Clr:     ui.Color{232, 152, 168, 255},
+				Clr:     theme.backgroundClr2,
 				Img:     &ed.header,
 				Constr:  ui.Constraint{2, 2, 2, 2},
 			},
-			HeaderHeight: 25,
-			TabFont:      &ed.font,
-			TabTextSize:  12,
-			TabClr:       uwuTextClr,
+			HeaderHeight:    25,
+			TabFont:         &ed.font,
+			TabTextSize:     12,
+			TabBckgroundClr: theme.backgroundClr3,
+			TabFontClr:      theme.normalTextClr2,
 		},
 	}
 	parent.AddWidget(textEd.tabViewer, ui.FitContainer)
@@ -96,6 +98,7 @@ func (t *textEditor) loadNode(node projectNode) {
 	name := node.name()
 
 	if !t.tabViewer.ContainsTab(name) {
+		theme := getTheme()
 		textBox := &ui.TextBox{
 			Background: ui.Background{
 				Visible: false,
@@ -135,9 +138,9 @@ func (t *textEditor) loadNode(node projectNode) {
 			"float32",
 		})
 		textBox.SetSyntaxColors(ui.ColorStyle{
-			Normal:  uwuTextClr,
-			Keyword: uwuKeywordClr,
-			Digit:   uwuDigitClr,
+			Normal:  theme.syntaxNormalClr,
+			Keyword: theme.syntaxKeywordClr,
+			Digit:   theme.syntaxNumberClr,
 		})
 		t.tabViewer.AddTab(name, textBox)
 		textBox.LoadBufferData(d)

@@ -14,11 +14,12 @@ type statusBar struct {
 }
 
 func newStatusBar(parent ui.Container, font *Font) statusBar {
+	theme := getTheme()
 	s := statusBar{
 		statusLayout: &ui.Layout{
 			Background: ui.Background{
 				Kind: ui.BackgroundSolidColor,
-				Clr:  uwuTextClr,
+				Clr:  theme.backgroundClr3,
 			},
 			Style: ui.Style{
 				Ordering: ui.StyleOrderColumn,
@@ -32,7 +33,7 @@ func newStatusBar(parent ui.Container, font *Font) statusBar {
 			},
 			Font: font,
 			Text: "",
-			Clr:  uwuBackgroundClr,
+			Clr:  theme.normalTextClr2,
 			Size: 12,
 		},
 		colLabel: &ui.Label{
@@ -41,7 +42,7 @@ func newStatusBar(parent ui.Container, font *Font) statusBar {
 			},
 			Font: font,
 			Text: "",
-			Clr:  uwuBackgroundClr,
+			Clr:  theme.normalTextClr2,
 			Size: 12,
 		},
 	}

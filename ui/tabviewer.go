@@ -13,14 +13,15 @@ type (
 		HeaderHeight     float64
 		headerRect       Rectangle
 
-		TabFont     Font
-		TabTextSize float64
-		TabClr      Color
-		tabRect     Rectangle
-		tabs        []tab
-		tabGens     []uint
-		tabCount    int
-		currentTab  tab
+		TabFont         Font
+		TabTextSize     float64
+		TabBckgroundClr Color
+		TabFontClr      Color
+		tabRect         Rectangle
+		tabs            []tab
+		tabGens         []uint
+		tabCount        int
+		currentTab      tab
 	}
 
 	tab struct {
@@ -69,7 +70,7 @@ func (t *TabViewer) draw(buf *renderBuffer) {
 		buf.addEntry(RenderEntry{
 			Kind: RenderRectangle,
 			Rect: tab.rect,
-			Clr:  t.TabClr,
+			Clr:  t.TabBckgroundClr,
 		})
 		textSize := t.TabFont.MeasureText(tab.name, t.TabTextSize)
 		buf.addEntry(RenderEntry{
@@ -79,7 +80,7 @@ func (t *TabViewer) draw(buf *renderBuffer) {
 				Y:      tab.rect.Y + (tab.rect.Height/2 - textSize[1]/2),
 				Height: t.TabTextSize,
 			},
-			Clr:  Color{255, 255, 255, 255},
+			Clr:  t.TabFontClr,
 			Font: t.TabFont,
 			Text: tab.name,
 		})

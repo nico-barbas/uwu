@@ -573,15 +573,16 @@ func (t *TextBox) moveCursorToNextWord() {
 }
 
 func (t *TextBox) moveCursorToPreviousWord() {
-	// Consume the first terminal symbol so the input doesn't get
-	// eaten by whitespaces and such.
 	if t.caret-1 >= 0 {
+		// Check if already at line start, if so go to previous line
 		if t.caret-1 < t.currentLine.start {
 			t.lineIndex -= 1
 			t.currentLine = &t.lines[t.lineIndex]
 			t.moveCursorLineEnd()
 			return
 		}
+		// Consume the first terminal symbol so the input doesn't get
+		// eaten by whitespaces and such.
 		c := t.charBuf[t.caret-1]
 		if isTerminalSymbol(c) {
 			t.cursor.X -= t.Font.GlyphAdvance(c, t.TextSize)

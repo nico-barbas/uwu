@@ -26,6 +26,7 @@ type Editor struct {
 	font   Font
 	header Image
 	layout Image
+	theme  theme
 
 	window   ui.WinHandle
 	treeView treeview
@@ -197,7 +198,9 @@ func NewEditor() *Editor {
 	ed.signals.init()
 	ed.ctx.SetCursorShapeCallback(changeEditorCursorShape)
 	ui.MakeContextCurrent(ed.ctx)
-	ed.font = NewFont("assets/CozetteVector.ttf", 72, []int{12})
+	ed.font = NewFont("assets/FiraSans-Regular.ttf", 72, []int{12})
+
+	setTheme(lightTheme)
 
 	// TODO: refactor this into a function
 	i, _, err := ebitenutil.NewImageFromFile("assets/uiHeader.png")
@@ -228,14 +231,14 @@ func NewEditor() *Editor {
 			Background: ui.Background{
 				Visible: true,
 				Kind:    ui.BackgroundSolidColor,
-				Clr:     uwuBackgroundClr,
+				Clr:     ed.theme.backgroundClr1,
 			},
 			HasHeader:    true,
 			HeaderHeight: 25,
 			HeaderBackground: ui.Background{
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
-				Clr:     ui.Color{232, 152, 168, 255},
+				Clr:     ed.theme.dividerClr,
 				Img:     &ed.header,
 				Constr:  ui.Constraint{2, 2, 2, 2},
 			},
@@ -243,7 +246,7 @@ func NewEditor() *Editor {
 			HeaderTitle:    "UwU",
 			HeaderFont:     &ed.font,
 			HeaderFontSize: 12,
-			HeaderFontClr:  uwuTextClr,
+			HeaderFontClr:  ed.theme.normalTextClr,
 			// HasCloseBtn:    true,
 			// CloseBtn: ui.Background{
 			// 	Visible: true,
@@ -352,6 +355,15 @@ func changeEditorCursorShape(s ui.CursorShape) {
 		ebitenCursorShape = ebiten.CursorShapeText
 	}
 	ebiten.SetCursorShape(ebitenCursorShape)
+}
+
+func setTheme(t theme) {
+	// TODO: Add signal
+	ed.theme = t
+}
+
+func getTheme() theme {
+	return ed.theme
 }
 
 // Static wrapper over the signal dispatcher

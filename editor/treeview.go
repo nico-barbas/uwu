@@ -13,12 +13,13 @@ type treeview struct {
 }
 
 func newTreeview(parent ui.Container, sepImg *Image, font *Font) treeview {
+	theme := getTheme()
 	treeview := treeview{}
 	treeview.list = &ui.List{
 		Background: ui.Background{
 			Visible: true,
 			Kind:    ui.BackgroundImageSlice,
-			Clr:     ui.Color{232, 152, 168, 255},
+			Clr:     theme.dividerClr,
 			Img:     sepImg,
 			Constr:  ui.Constraint{2, 2, 2, 2},
 		},
@@ -30,7 +31,7 @@ func newTreeview(parent ui.Container, sepImg *Image, font *Font) treeview {
 		Name:       "Root",
 		Font:       font,
 		TextSize:   12,
-		TextClr:    uwuTextClr,
+		TextClr:    theme.normalTextClr,
 		IndentSize: 10,
 	}
 	parent.AddWidget(treeview.list, treeviewWidth)
