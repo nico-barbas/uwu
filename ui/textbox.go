@@ -42,6 +42,7 @@ type (
 		LinePadding float64
 		TabSize     int
 		AutoIndent  bool
+		Multiline   bool
 		Font        Font
 		TextSize    float64
 		TextClr     Color
@@ -80,8 +81,6 @@ type (
 		// For graphical display
 		origin Point
 	}
-
-	cursorDir uint8
 )
 
 func (t *TextBox) init() {
@@ -171,7 +170,7 @@ func (t *TextBox) update(parentFocused bool) {
 				}
 			}
 		}
-		if isKeyRepeated(keyEnter) {
+		if isKeyRepeated(keyEnter) && t.Multiline {
 			t.insertLine()
 		}
 		if isKeyRepeated(keyTab) {
@@ -359,10 +358,6 @@ func (t *TextBox) LoadBufferData(data []rune) error {
 		t.lexLine(&t.lines[i])
 	}
 	return nil
-}
-
-func (t *TextBox) GetCharBuffer() []rune {
-	return t.charBuf[:t.charCount]
 }
 
 func (t *TextBox) insertChar(r rune) {
@@ -659,6 +654,34 @@ func (t *TextBox) CurrentLine() int {
 
 func (t *TextBox) CurrentColumn() int {
 	return t.caret - t.currentLine.start
+}
+
+func (t *TextBox) GetCharBuffer() []rune {
+	return t.charBuf[:t.charCount]
+}
+
+func (t *TextBox) EmptyCharBuffer() {
+	t.charCount = 0
+	t.caret = 0
+	t.lineCount = 1
+	t.currentLine = &t.lines[0]
+	t.lineIndex = 0
+	t.lines[0] = line{
+		id:    0,
+		text:  fmt.Sprint(1),
+		start: 0,
+		end:   0,
+		origin: Point{
+			t.activeRect.X,
+			t.activeRect.Y,
+		},
+	}
+	t.lines[0].tokens = make([]token, initialTokenCap)
+	t.cursor = Rectangle{
+		X: t.activeRect.X, Y: t.activeRect.Y,
+		Width: textCursorWidth, Height: t.TextSize,
+	}
+
 }
 
 //

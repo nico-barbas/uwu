@@ -39,6 +39,7 @@ type Editor struct {
 	window   ui.WinHandle
 	treeView treeview
 	textEd   textEditor
+	cmdPanel CmdPanel
 
 	statusbar statusBar
 }
@@ -70,6 +71,7 @@ func (ed *Editor) Update() error {
 		})
 
 		ed.textEd.updateTextEditor()
+		ed.cmdPanel.updateCmdPanel()
 	}
 	return ed.closeState
 }
@@ -281,7 +283,7 @@ func NewEditor() *Editor {
 
 	ed.window = ui.AddWindow(
 		ui.Window{
-			Active: true,
+			Active: false,
 			Rect:   ui.Rectangle{0, 0, 1600, 900},
 			Style: ui.Style{
 				Ordering: ui.StyleOrderRow,
@@ -323,6 +325,7 @@ func NewEditor() *Editor {
 			},
 		},
 	)
+	ed.window.UnfocusWindow()
 	ed.window.SetCloseBtn(ui.Button{
 		Background: ui.Background{
 			Visible: true,
@@ -378,60 +381,9 @@ func NewEditor() *Editor {
 	ed.statusbar = newStatusBar(ed.window, &ed.font)
 	ed.statusbar.initStatusBar()
 
-	//
-	// Search window
-	//
-	// cmdHdl := ui.AddWindow(ui.Window{
-	// 	Active: true,
-	// 	Rect:   ui.Rectangle{550, 380, 500, 44},
-	// 	Style: ui.Style{
-	// 		Ordering: ui.StyleOrderRow,
-	// 		Padding:  0,
-	// 		Margin:   ui.Point{0, 0},
-	// 	},
-	// 	Background: ui.Background{
-	// 		Visible: true,
-	// 		Kind:    ui.BackgroundSolidColor,
-	// 		Clr:     uwuBackgroundClr,
-	// 	},
-	// 	HasHeader:    true,
-	// 	HeaderHeight: 20,
-	// 	HeaderBackground: ui.Background{
-	// 		Visible: true,
-	// 		Kind:    ui.BackgroundImageSlice,
-	// 		Clr:     ui.Color{232, 152, 168, 255},
-	// 		Img:     &ed.header,
-	// 		Constr:  ui.Constraint{2, 2, 2, 2},
-	// 	},
-	// 	HasHeaderTitle: true,
-	// 	HeaderTitle:    "Command",
-	// 	HeaderFont:     &ed.font,
-	// 	HeaderFontSize: 12,
-	// 	HeaderFontClr:  uwuTextClr,
+	// cmd panel
+	ed.cmdPanel.initCmdPanel()
 
-	// 	HasBorders:  true,
-	// 	BorderWidth: 1,
-	// 	BorderColor: ui.Color{0, 0, 0, 255},
-	// 	// HasCloseBtn:    true,
-	// 	// CloseBtn: ui.Background{
-	// 	// 	Visible: true,
-	// 	// 	Kind:    ui.BackgroundImageSlice,
-	// 	// 	Clr:     ui.Color{255, 255, 255, 255},
-	// 	// 	Img:     &uiBtn,
-	// 	// 	Constr:  ui.Constraint{2, 2, 2, 2},
-	// 	// },
-	// })
-	// searchBar := &ui.TextBox{
-	// 	Background: ui.Background{
-	// 		Visible: false,
-	// 	},
-	// 	Cap:      500,
-	// 	Margin:   3,
-	// 	Font:     &ed.font,
-	// 	TextSize: 12,
-	// 	TextClr:  uwuTextClr,
-	// }
-	// cmdHdl.AddWidget(searchBar, ui.FitContainer)
 	return ed
 }
 

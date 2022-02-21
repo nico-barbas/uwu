@@ -109,6 +109,7 @@ func (t *textEditor) loadNode(node projectNode) {
 			TextSize:           12,
 			TabSize:            2,
 			AutoIndent:         true,
+			Multiline:          true,
 			HasRuler:           true,
 			HasSyntaxHighlight: true,
 			ShowCurrentLine:    true,

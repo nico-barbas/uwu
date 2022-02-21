@@ -2,6 +2,7 @@ package ui
 
 import (
 	"log"
+	"sort"
 )
 
 // Capacity of each context.
@@ -74,7 +75,14 @@ func AddWindow(w Window) WinHandle {
 	// Push the new window onto the active
 	// window array and initialize it
 	ctx.actives[ctx.count] = &node.win
-	FocusWindow(handle)
+	for i := 0; i < ctx.count; i += 1 {
+		win := ctx.actives[i]
+		if win.handle.id == handle.id && win.handle.gen == handle.gen {
+			win.zIndex = 0
+		} else {
+			win.zIndex += 1
+		}
+	}
 	ctx.actives[ctx.count].initWindow()
 	ctx.count += 1
 	return handle
@@ -108,17 +116,6 @@ func getWindow(h WinHandle) *Window {
 		return nil
 	}
 	return &node.win
-}
-
-func FocusWindow(h WinHandle) {
-	for i := 0; i < ctx.count; i += 1 {
-		win := ctx.actives[i]
-		if win.handle.id == h.id && win.handle.gen == h.gen {
-			win.zIndex = 0
-		} else {
-			win.zIndex += 1
-		}
-	}
 }
 
 // Function used internally!
@@ -172,6 +169,9 @@ func (c *Context) UpdateUI(data Input) {
 }
 
 func (c *Context) DrawUI() []RenderEntry {
+	sort.SliceStable(c.actives[:c.count], func(i, j int) bool {
+		return c.actives[i].zIndex > c.actives[j].zIndex
+	})
 	for i := 0; i < ctx.count; i += 1 {
 		c.actives[i].draw(&c.renderBuf)
 	}

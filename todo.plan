@@ -4,8 +4,8 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -515.7176513671875,
-  "Pan.Y": -371.1200866699219,
+  "Pan.X": -537.2176513671875,
+  "Pan.Y": -336.1200866699219,
   "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
@@ -167,7 +167,7 @@
       "BoardIndex": 0,
       "Position.X": 192,
       "Position.Y": 368,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Functional Header buttons",
@@ -468,11 +468,11 @@
       "BoardIndex": 0,
       "Position.X": 192,
       "Position.Y": 176,
-      "Checkbox.Checked": false,
+      "Checkbox.Checked": true,
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Z indexing",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 18 2022 19:50:52"
     }, 
@@ -499,6 +499,18 @@
       "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 20 2022 13:05:43"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 224,
+      "Position.Y": 512,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Refactor line rendering so it starts to count after the tabs",
+      "Selected": true,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 21 2022 11:47:16"
     }
   ]
 }

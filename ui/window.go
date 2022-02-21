@@ -60,6 +60,10 @@ func (win *Window) initWindow() {
 }
 
 func (win *Window) update() {
+	if !win.Active {
+		return
+	}
+
 	focused := win.zIndex == 0
 	win.widgets.updateWidgets(focused)
 	win.MinimizeBtn.update(focused)
@@ -67,6 +71,10 @@ func (win *Window) update() {
 }
 
 func (win *Window) draw(buf *renderBuffer) {
+	if !win.Active {
+		return
+	}
+
 	bgEntry := win.Background.entry(win.Rect)
 	buf.addEntry(bgEntry)
 
@@ -163,6 +171,20 @@ type WinHandle struct {
 	gen uint
 }
 
+func (h WinHandle) SetActive(active bool) {
+	getWindow(h).Active = active
+	switch active {
+	case true:
+		h.FocusWindow()
+	case false:
+		h.UnfocusWindow()
+	}
+}
+
+func (h WinHandle) IsActive() bool {
+	return getWindow(h).Active
+}
+
 func (h WinHandle) SetCloseBtn(btn Button) {
 	getWindow(h).setCloseBtn(btn)
 }
@@ -177,4 +199,32 @@ func (h WinHandle) AddWidget(wgt Widget, length int) {
 
 func (h WinHandle) RemainingLength() int {
 	return getWindow(h).RemainingLength()
+}
+
+func (h WinHandle) FocusWindow() {
+	if getWindow(h).zIndex == 0 {
+		return
+	}
+	for i := 0; i < ctx.count; i += 1 {
+		win := ctx.actives[i]
+		if win.handle.id == h.id && win.handle.gen == h.gen {
+			win.zIndex = 0
+		} else {
+			win.zIndex += 1
+		}
+	}
+}
+
+func (h WinHandle) UnfocusWindow() {
+	if getWindow(h).zIndex != 0 {
+		return
+	}
+	for i := 0; i < ctx.count; i += 1 {
+		win := ctx.actives[i]
+		if win.handle.id == h.id && win.handle.gen == h.gen {
+			win.zIndex = ctx.count - 1
+		} else {
+			win.zIndex -= 1
+		}
+	}
 }
