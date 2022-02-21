@@ -283,7 +283,7 @@ func NewEditor() *Editor {
 
 	ed.window = ui.AddWindow(
 		ui.Window{
-			Active: false,
+			Active: true,
 			Rect:   ui.Rectangle{0, 0, 1600, 900},
 			Style: ui.Style{
 				Ordering: ui.StyleOrderRow,
@@ -325,7 +325,6 @@ func NewEditor() *Editor {
 			},
 		},
 	)
-	ed.window.UnfocusWindow()
 	ed.window.SetCloseBtn(ui.Button{
 		Background: ui.Background{
 			Visible: true,

@@ -4,8 +4,8 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -537.2176513671875,
-  "Pan.Y": -336.1200866699219,
+  "Pan.X": -468.7076416015625,
+  "Pan.Y": -401.54498291015625,
   "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
@@ -508,9 +508,21 @@
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Refactor line rendering so it starts to count after the tabs",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 21 2022 11:47:16"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 192,
+      "Position.Y": 528,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Set focus on textbox when cmd panel gets focused/opened",
+      "Selected": true,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 21 2022 14:09:58"
     }
   ]
 }
