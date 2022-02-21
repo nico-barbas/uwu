@@ -4,25 +4,35 @@ import (
 	"log"
 )
 
-type Button struct {
-	widgetRoot
-	Background   Background
-	Clr          Color
-	HighlightClr Color
-	PressedClr   Color
+type (
+	Button struct {
+		widgetRoot
+		UserID       ButtonID
+		Background   Background
+		Clr          Color
+		HighlightClr Color
+		PressedClr   Color
 
-	Receiver ButtonReceiver
-	pressed  bool
+		Receiver ButtonReceiver
+		pressed  bool
 
-	HasText  bool
-	Font     Font
-	Text     string
-	TextClr  Color
-	TextSize float64
-}
+		HasText  bool
+		Font     Font
+		Text     string
+		TextClr  Color
+		TextSize float64
+
+		HasIcon bool
+		Icon    Image
+		IconClr Color
+		// iconRect Rectangle
+	}
+
+	ButtonID int
+)
 
 type ButtonReceiver interface {
-	OnButtonPressed(w Widget)
+	OnButtonPressed(w Widget, id ButtonID)
 }
 
 func (btn *Button) init() {
@@ -37,7 +47,7 @@ func (btn *Button) update(parentFocused bool) {
 		btn.Background.Clr = btn.HighlightClr
 		if released {
 			if btn.Receiver != nil {
-				btn.Receiver.OnButtonPressed(btn)
+				btn.Receiver.OnButtonPressed(btn, btn.UserID)
 			} else {
 				log.SetPrefix("[UI Debug]: ")
 				log.Println("No Receiver attached to this button")
@@ -64,17 +74,31 @@ func (btn *Button) draw(buf *renderBuffer) {
 	bgEntry := btn.Background.entry(btn.rect)
 	buf.addEntry(bgEntry)
 
-	textSize := btn.Font.MeasureText(btn.Text, btn.TextSize)
-	textEntry := RenderEntry{
-		Kind: RenderText,
-		Rect: Rectangle{
-			X:      btn.rect.X + (btn.rect.Width/2 - textSize[0]/2),
-			Y:      btn.rect.Y + (btn.rect.Height/2 - textSize[1]/2),
-			Height: btn.TextSize,
-		},
-		Clr:  btn.TextClr,
-		Font: btn.Font,
-		Text: btn.Text,
+	if btn.HasText {
+		textSize := btn.Font.MeasureText(btn.Text, btn.TextSize)
+		textEntry := RenderEntry{
+			Kind: RenderText,
+			Rect: Rectangle{
+				X:      btn.rect.X + (btn.rect.Width/2 - textSize[0]/2),
+				Y:      btn.rect.Y + (btn.rect.Height/2 - textSize[1]/2),
+				Height: btn.TextSize,
+			},
+			Clr:  btn.TextClr,
+			Font: btn.Font,
+			Text: btn.Text,
+		}
+		buf.addEntry(textEntry)
 	}
-	buf.addEntry(textEntry)
+	if btn.HasIcon {
+		iconRect := Rectangle{
+			X: btn.rect.X + (btn.rect.Width/2 - btn.Icon.GetWidth()/2),
+			Y: btn.rect.Y + (btn.rect.Height/2 - btn.Icon.GetHeight()/2),
+		}
+		buf.addEntry(RenderEntry{
+			Kind: RenderImage,
+			Rect: iconRect,
+			Img:  btn.Icon,
+			Clr:  btn.IconClr,
+		})
+	}
 }

@@ -15,17 +15,25 @@ const (
 	EditorColumnChanged
 )
 
+const (
+	editorCloseBtn ui.ButtonID = iota
+	editorMinimizeBtn
+)
+
 var ed *Editor
 
 type Editor struct {
-	ctx     *ui.Context
-	project project
-	signals signalDispatcher
+	ctx        *ui.Context
+	closeState error
+	project    project
+	signals    signalDispatcher
 
 	// Editor's resources
 	font   Font
 	header Image
 	layout Image
+	cross  Image
+	dash   Image
 	theme  theme
 
 	window   ui.WinHandle
@@ -37,31 +45,33 @@ type Editor struct {
 
 func (ed *Editor) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
-		return fmt.Errorf("closing editor")
+		ed.closeState = fmt.Errorf("closing editor")
 	}
-	var runes []rune
-	runes = ebiten.AppendInputChars(runes[:0])
-	for _, r := range runes {
-		ed.ctx.AppendCharPressed(r)
-		// key = rl.GetCharPressed()
-	}
-	mx, my := ebiten.CursorPosition()
-	mleft := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
-	ed.ctx.UpdateUI(ui.Input{
-		MPos:  ui.Point{float64(mx), float64(my)},
-		MLeft: mleft,
-		Enter: ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeyKPEnter),
-		Del:   ebiten.IsKeyPressed(ebiten.KeyBackspace),
-		Ctrl:  ebiten.IsKeyPressed(ebiten.KeyControlLeft) || ebiten.IsKeyPressed(ebiten.KeyControlRight),
-		Tab:   ebiten.IsKeyPressed(ebiten.KeyTab),
-		Left:  ebiten.IsKeyPressed(ebiten.KeyLeft),
-		Right: ebiten.IsKeyPressed(ebiten.KeyRight),
-		Up:    ebiten.IsKeyPressed(ebiten.KeyUp),
-		Down:  ebiten.IsKeyPressed(ebiten.KeyDown),
-	})
+	if ed.closeState == nil {
+		var runes []rune
+		runes = ebiten.AppendInputChars(runes[:0])
+		for _, r := range runes {
+			ed.ctx.AppendCharPressed(r)
+			// key = rl.GetCharPressed()
+		}
+		mx, my := ebiten.CursorPosition()
+		mleft := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+		ed.ctx.UpdateUI(ui.Input{
+			MPos:  ui.Point{float64(mx), float64(my)},
+			MLeft: mleft,
+			Enter: ebiten.IsKeyPressed(ebiten.KeyEnter) || ebiten.IsKeyPressed(ebiten.KeyKPEnter),
+			Del:   ebiten.IsKeyPressed(ebiten.KeyBackspace),
+			Ctrl:  ebiten.IsKeyPressed(ebiten.KeyControlLeft) || ebiten.IsKeyPressed(ebiten.KeyControlRight),
+			Tab:   ebiten.IsKeyPressed(ebiten.KeyTab),
+			Left:  ebiten.IsKeyPressed(ebiten.KeyLeft),
+			Right: ebiten.IsKeyPressed(ebiten.KeyRight),
+			Up:    ebiten.IsKeyPressed(ebiten.KeyUp),
+			Down:  ebiten.IsKeyPressed(ebiten.KeyDown),
+		})
 
-	ed.textEd.updateTextEditor()
-	return nil
+		ed.textEd.updateTextEditor()
+	}
+	return ed.closeState
 }
 
 func (ed *Editor) Draw(screen *ebiten.Image) {
@@ -90,6 +100,40 @@ func (ed *Editor) Draw(screen *ebiten.Image) {
 				e.Rect.Width, e.Rect.Height,
 				e.Clr,
 			)
+
+		case ui.RenderImageFit:
+			img := e.Img.(*Image)
+			scaleX := e.Rect.Width / e.Img.GetWidth()
+			scaleY := e.Rect.Height / e.Img.GetHeight()
+
+			opt := ebiten.DrawImageOptions{}
+			opt.GeoM.Scale(scaleX, scaleY)
+			opt.GeoM.Translate(e.Rect.X, e.Rect.Y)
+			if e.Clr[3] != 0 {
+				r, g, b, a := e.Clr.RGBA()
+				opt.ColorM.Scale(
+					float64(r)/float64(a),
+					float64(g)/float64(a),
+					float64(b)/float64(a),
+					float64(a)/0xffff,
+				)
+			}
+			screen.DrawImage(img.data, &opt)
+
+		case ui.RenderImage:
+			img := e.Img.(*Image)
+			opt := ebiten.DrawImageOptions{}
+			opt.GeoM.Translate(e.Rect.X, e.Rect.Y)
+			if e.Clr[3] != 0 {
+				r, g, b, a := e.Clr.RGBA()
+				opt.ColorM.Scale(
+					float64(r)/float64(a),
+					float64(g)/float64(a),
+					float64(b)/float64(a),
+					float64(a)/0xffff,
+				)
+			}
+			screen.DrawImage(img.data, &opt)
 
 		case ui.RenderImageSlice:
 			dstRects := [9]ui.Rectangle{}
@@ -198,7 +242,7 @@ func NewEditor() *Editor {
 	ed.signals.init()
 	ed.ctx.SetCursorShapeCallback(changeEditorCursorShape)
 	ui.MakeContextCurrent(ed.ctx)
-	ed.font = NewFont("assets/FiraSans-Regular.ttf", 72, []int{12})
+	ed.font = NewFont("assets/CozetteVector.ttf", 72, []int{12})
 
 	setTheme(lightTheme)
 
@@ -216,6 +260,22 @@ func NewEditor() *Editor {
 		panic(err)
 	}
 	ed.layout = Image{
+		data: i,
+	}
+
+	i, _, err = ebitenutil.NewImageFromFile("assets/uiCross.png")
+	if err != nil {
+		panic(err)
+	}
+	ed.cross = Image{
+		data: i,
+	}
+
+	i, _, err = ebitenutil.NewImageFromFile("assets/uiDash.png")
+	if err != nil {
+		panic(err)
+	}
+	ed.dash = Image{
 		data: i,
 	}
 
@@ -247,16 +307,50 @@ func NewEditor() *Editor {
 			HeaderFont:     &ed.font,
 			HeaderFontSize: 12,
 			HeaderFontClr:  ed.theme.normalTextClr,
-			// HasCloseBtn:    true,
-			// CloseBtn: ui.Background{
-			// 	Visible: true,
-			// 	Kind:    ui.BackgroundImageSlice,
-			// 	Clr:     ui.Color{255, 255, 255, 255},
-			// 	Img:     &uiBtn,
-			// 	Constr:  ui.Constraint{2, 2, 2, 2},
-			// },
+
+			CloseBtn: ui.Button{
+				Background: ui.Background{
+					Visible: true,
+					Kind:    ui.BackgroundSolidColor,
+				},
+				Clr:          ed.theme.backgroundClr3,
+				HighlightClr: ed.theme.backgroundClr3,
+				PressedClr:   ed.theme.backgroundClr3,
+				HasIcon:      true,
+				Icon:         &ed.cross,
+				IconClr:      ed.theme.backgroundClr1,
+				Receiver:     ed,
+			},
 		},
 	)
+	ed.window.SetCloseBtn(ui.Button{
+		Background: ui.Background{
+			Visible: true,
+			Kind:    ui.BackgroundSolidColor,
+		},
+		UserID:       editorCloseBtn,
+		Clr:          ed.theme.backgroundClr3,
+		HighlightClr: ed.theme.backgroundClr3,
+		PressedClr:   ed.theme.backgroundClr3,
+		HasIcon:      true,
+		Icon:         &ed.cross,
+		IconClr:      ed.theme.backgroundClr1,
+		Receiver:     ed,
+	})
+	ed.window.SetMinimizeBtn(ui.Button{
+		Background: ui.Background{
+			Visible: true,
+			Kind:    ui.BackgroundSolidColor,
+		},
+		UserID:       editorMinimizeBtn,
+		Clr:          ed.theme.backgroundClr3,
+		HighlightClr: ed.theme.backgroundClr3,
+		PressedClr:   ed.theme.backgroundClr3,
+		HasIcon:      true,
+		Icon:         &ed.dash,
+		IconClr:      ed.theme.backgroundClr1,
+		Receiver:     ed,
+	})
 
 	// rem := ui.ContainerRemainingLength(ed.window)
 	rem := ed.window.RemainingLength()
@@ -339,6 +433,15 @@ func NewEditor() *Editor {
 	// }
 	// cmdHdl.AddWidget(searchBar, ui.FitContainer)
 	return ed
+}
+
+func (e *Editor) OnButtonPressed(w ui.Widget, id ui.ButtonID) {
+	switch id {
+	case editorMinimizeBtn:
+		ebiten.MinimizeWindow()
+	case editorCloseBtn:
+		ed.closeState = fmt.Errorf("closing editor")
+	}
 }
 
 func openProjectFile(name string) {

@@ -1,7 +1,5 @@
 package ui
 
-import "log"
-
 type Window struct {
 	handle     WinHandle
 	zIndex     int
@@ -27,29 +25,19 @@ type Window struct {
 	HeaderFontClr    Color
 	headerTitlePos   Point
 
-	HasCloseBtn  bool
-	CloseBtn     Background
-	closeBtnRect Rectangle
+	MinimizeBtn Button
+	CloseBtn    Button
 }
 
 func (win *Window) initWindow() {
-	if (win.HasCloseBtn || win.HasHeaderTitle) && !win.HasHeader {
-		// What is the best behavior here? Should the UI force a header on the window?
-		// Or should it disable the Close button?
-		log.SetPrefix("[UI Error]: ")
-		log.Fatalln("Can not add a Close button on a headerless Window")
-		win.HasCloseBtn = false
-	}
+	// if (win.HasHeaderBtn || win.HasHeaderTitle) && !win.HasHeader {
+	// 	// What is the best behavior here? Should the UI force a header on the window?
+	// 	// Or should it disable the Close button?
+	// 	log.SetPrefix("[UI Error]: ")
+	// 	log.Fatalln("Can not add a Close button on a headerless Window")
+	// 	win.HasHeaderBtn = false
+	// }
 	if win.HasHeader {
-		if win.HasCloseBtn {
-			width := win.HeaderHeight - (win.Style.Margin[1] * 2)
-			win.closeBtnRect = Rectangle{
-				X:      win.Rect.X + win.Rect.Width - width - win.Style.Margin[0],
-				Y:      win.Rect.Y + win.Style.Margin[1],
-				Width:  width,
-				Height: width,
-			}
-		}
 		win.headerRect = Rectangle{
 			X: win.Rect.X, Y: win.Rect.Y,
 			Width: win.Rect.Width, Height: win.HeaderHeight,
@@ -72,7 +60,10 @@ func (win *Window) initWindow() {
 }
 
 func (win *Window) update() {
-	win.widgets.updateWidgets(win.zIndex == 0)
+	focused := win.zIndex == 0
+	win.widgets.updateWidgets(focused)
+	win.MinimizeBtn.update(focused)
+	win.CloseBtn.update(focused)
 }
 
 func (win *Window) draw(buf *renderBuffer) {
@@ -95,10 +86,8 @@ func (win *Window) draw(buf *renderBuffer) {
 				Text: win.HeaderTitle,
 			})
 		}
-		if win.HasCloseBtn {
-			btnEntry := win.CloseBtn.entry(win.closeBtnRect)
-			buf.addEntry(btnEntry)
-		}
+		win.MinimizeBtn.draw(buf)
+		win.CloseBtn.draw(buf)
 	}
 
 	win.widgets.drawWidgets(buf)
@@ -147,9 +136,39 @@ func (w *Window) RemainingLength() int {
 	return w.widgets.getRemainingLen(w.activeRect)
 }
 
+func (w *Window) setCloseBtn(btn Button) {
+	width := w.HeaderHeight - (w.Style.Margin[1] * 2)
+	w.CloseBtn = btn
+	w.CloseBtn.setRect(Rectangle{
+		X:      w.Rect.X + w.Rect.Width - width - w.Style.Margin[0],
+		Y:      w.Rect.Y + w.Style.Margin[1],
+		Width:  width,
+		Height: width - w.Style.Margin[0]*2,
+	})
+}
+
+func (w *Window) setMinimizeBtn(btn Button) {
+	width := w.HeaderHeight - (w.Style.Margin[1] * 2)
+	w.MinimizeBtn = btn
+	w.MinimizeBtn.setRect(Rectangle{
+		X:      w.Rect.X + w.Rect.Width - width*2 - w.Style.Margin[0],
+		Y:      w.Rect.Y + w.Style.Margin[1],
+		Width:  width,
+		Height: width - w.Style.Margin[0]*2,
+	})
+}
+
 type WinHandle struct {
 	id  int
 	gen uint
+}
+
+func (h WinHandle) SetCloseBtn(btn Button) {
+	getWindow(h).setCloseBtn(btn)
+}
+
+func (h WinHandle) SetMinimizeBtn(btn Button) {
+	getWindow(h).setMinimizeBtn(btn)
 }
 
 func (h WinHandle) AddWidget(wgt Widget, length int) {

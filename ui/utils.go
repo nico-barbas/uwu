@@ -119,6 +119,7 @@ func (b Background) entry(rect Rectangle) RenderEntry {
 const (
 	RenderRectangle RenderCommand = iota
 	RenderImage
+	RenderImageFit
 	RenderImageSlice
 	RenderText
 )
