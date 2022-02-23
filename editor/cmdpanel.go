@@ -2,6 +2,7 @@ package editor
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -83,16 +84,28 @@ func (c *CmdPanel) initCmdPanel() {
 func (c *CmdPanel) updateCmdPanel() {
 	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyP) {
 		c.window.SetActive(!c.window.IsActive())
+		c.textBox.SetFocus(true)
 	}
 	if c.window.IsActive() {
 		if inpututil.IsKeyJustPressed(ebiten.KeyEnter) {
 			cmd := c.textBox.GetCharBuffer()
-			switch string(cmd) {
-			case "open":
-				fmt.Println("Open file please!")
-			}
+			c.parseCommand(string(cmd))
+
 			c.textBox.EmptyCharBuffer()
+			c.window.SetActive(false)
 		}
+	}
+}
+
+func (c *CmdPanel) parseCommand(input string) {
+	tokens := strings.Split(input, " ")
+
+	switch tokens[0] {
+	case ":openproject":
+		FireSignal(EditorProjectOpened, SignalString(tokens[1]))
+	case ":openprojectfile":
+	default:
+		fmt.Println("unknown command")
 	}
 }
 

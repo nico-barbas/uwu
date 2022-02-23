@@ -13,6 +13,7 @@ import (
 const (
 	EditorLineChanged SignalKind = iota
 	EditorColumnChanged
+	EditorProjectOpened
 )
 
 const (
@@ -281,6 +282,8 @@ func NewEditor() *Editor {
 		data: i,
 	}
 
+	ed.signals.addListener(EditorProjectOpened, ed)
+
 	ed.window = ui.AddWindow(
 		ui.Window{
 			Active: true,
@@ -369,9 +372,9 @@ func NewEditor() *Editor {
 	ed.window.AddWidget(lyt, rem-20)
 
 	// Project and Treeview display
-	ed.project = openProject(".")
+	// ed.project = openProject(".")
 	ed.treeView = newTreeview(lyt, &ed.layout, &ed.font)
-	ed.treeView.loadProject(&ed.project)
+	// ed.treeView.loadProject(&ed.project)
 
 	// Text editor
 	ed.textEd = newTextEditor(lyt)
@@ -392,6 +395,15 @@ func (e *Editor) OnButtonPressed(w ui.Widget, id ui.ButtonID) {
 		ebiten.MinimizeWindow()
 	case editorCloseBtn:
 		ed.closeState = fmt.Errorf("closing editor")
+	}
+}
+
+func (e *Editor) OnSignal(s Signal) {
+	switch s.Kind {
+	case EditorProjectOpened:
+		path := string(s.Value.(SignalString))
+		ed.project = openProject(path)
+		ed.treeView.loadProject(&ed.project)
 	}
 }
 

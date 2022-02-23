@@ -6,8 +6,8 @@ import (
 )
 
 var exceptionList = []string{
-	"./.git",
-	"./.vscode",
+	".git",
+	".vscode",
 }
 
 type (
@@ -68,7 +68,7 @@ func (p *project) readDir(path string) {
 				dirPath += "/"
 			}
 			dirPath += dirName
-			if !isPathException(dirPath) {
+			if !isDirException(dirName) {
 				p.current.addSubFolder(f)
 				p.previous = p.current
 				p.current = p.current.nodes[dirName].(*folder)
@@ -76,7 +76,9 @@ func (p *project) readDir(path string) {
 				p.current = p.previous
 			}
 		case false:
-			p.current.addFile(f)
+			if !isDirException(f.Name()) {
+				p.current.addFile(f)
+			}
 		}
 	}
 }
@@ -146,7 +148,10 @@ func (f file) getEntry() fs.DirEntry {
 	return f.entry
 }
 
-func isPathException(path string) bool {
+func isDirException(path string) bool {
+	if path[0] == '.' {
+		return true
+	}
 	for _, e := range exceptionList {
 		if e == path {
 			return true

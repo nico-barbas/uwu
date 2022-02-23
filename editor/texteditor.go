@@ -28,7 +28,7 @@ func newTextEditor(parent ui.Container) textEditor {
 			HeaderBackground: ui.Background{
 				Visible: true,
 				Kind:    ui.BackgroundImageSlice,
-				Clr:     theme.backgroundClr2,
+				Clr:     theme.dividerClr,
 				Img:     &ed.header,
 				Constr:  ui.Constraint{2, 2, 2, 2},
 			},

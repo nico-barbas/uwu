@@ -648,6 +648,10 @@ func (t *TextBox) moveCursorLineEnd() {
 	t.cursor.Y = t.currentLine.origin[1]
 }
 
+func (t *TextBox) SetFocus(f bool) {
+	t.focused = f
+}
+
 func (t *TextBox) CurrentLine() int {
 	return t.lineIndex + 1
 }
