@@ -3,6 +3,7 @@ package editor
 import (
 	"fmt"
 
+	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/nico-ec/uwu/ui"
 )
 
@@ -11,6 +12,12 @@ type statusBar struct {
 
 	lineLabel *ui.Label
 	colLabel  *ui.Label
+	errIcon   *ui.Icon
+	errLabel  *ui.Label
+
+	errorRaisedRecently bool
+	errorTimer          int
+	errorDuration       int
 }
 
 func newStatusBar(parent ui.Container, font *Font) statusBar {
@@ -45,10 +52,23 @@ func newStatusBar(parent ui.Container, font *Font) statusBar {
 			Clr:  theme.normalTextClr2,
 			Size: 12,
 		},
+		errIcon: &ui.Icon{},
+		errLabel: &ui.Label{
+			Background: ui.Background{
+				Visible: false,
+			},
+			Font:  font,
+			Text:  "",
+			Align: ui.TextAlignCenterLeft,
+			Clr:   theme.normalTextClr2,
+			Size:  12,
+		},
 	}
-	parent.AddWidget(s.statusLayout, ui.FitContainer)
+	parent.AddWidget(s.statusLayout, ui.FitContainer) // 20 units I think
 	s.statusLayout.AddWidget(s.lineLabel, int(font.MeasureText("line: 0000", 12)[0]))
 	s.statusLayout.AddWidget(s.colLabel, int(font.MeasureText("column: 0000", 12)[0]))
+	s.statusLayout.AddWidget(s.errIcon, 20)
+	s.statusLayout.AddWidget(s.errLabel, ui.FitContainer)
 
 	return s
 }
@@ -56,6 +76,20 @@ func newStatusBar(parent ui.Container, font *Font) statusBar {
 func (s *statusBar) initStatusBar() {
 	AddSignalListener(EditorLineChanged, s)
 	AddSignalListener(EditorColumnChanged, s)
+	AddSignalListener(EditorErrorRaised, s)
+}
+
+func (s *statusBar) updateStatusBar() {
+	if s.errorRaisedRecently {
+		s.errorTimer += 1
+		if s.errorTimer == s.errorDuration {
+			s.errorRaisedRecently = false
+			s.errorTimer = 0
+			// TODO: Have a cleaner way to do that
+			s.errIcon.Img = nil
+			s.errLabel.Text = ""
+		}
+	}
 }
 
 func (s *statusBar) OnSignal(signal Signal) {
@@ -68,5 +102,19 @@ func (s *statusBar) OnSignal(signal Signal) {
 		s.colLabel.SetText(
 			fmt.Sprintf("column: %d", signal.Value),
 		)
+
+	case EditorErrorRaised:
+		err := signal.Value.(SignalError)
+		var iconImg *Image
+		switch err.Kind {
+		case editorWarning:
+			iconImg = &ed.warning
+		case editorError:
+			iconImg = &ed.err
+		}
+		s.errIcon.Img = iconImg
+		s.errLabel.SetText(err.Msg)
+		s.errorRaisedRecently = true
+		s.errorDuration = ebiten.MaxTPS() * 5
 	}
 }

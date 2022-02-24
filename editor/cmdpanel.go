@@ -1,7 +1,6 @@
 package editor
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -100,14 +99,42 @@ func (c *CmdPanel) updateCmdPanel() {
 }
 
 func (c *CmdPanel) parseCommand(input string) {
+	if len(input) == 0 {
+		err := SignalError{
+			Kind: editorWarning,
+			Msg:  "Unknown command",
+		}
+		FireSignal(EditorErrorRaised, err)
+		return
+	}
 	tokens := strings.Split(input, " ")
 
 	switch tokens[0] {
 	case ":openproject":
+		if len(tokens) != 2 {
+			err := SignalError{
+				Kind: editorError,
+				Msg:  "Invalid arguments for command ':openproject'",
+			}
+			FireSignal(EditorErrorRaised, err)
+			return
+		}
 		FireSignal(EditorProjectOpened, SignalString(tokens[1]))
 	case ":openprojectfile":
+		if len(tokens) != 2 {
+			err := SignalError{
+				Kind: editorError,
+				Msg:  "Invalid arguments for command ':openprojectfile'",
+			}
+			FireSignal(EditorErrorRaised, err)
+			return
+		}
 	default:
-		fmt.Println("unknown command")
+		err := SignalError{
+			Kind: editorWarning,
+			Msg:  "Unknown command",
+		}
+		FireSignal(EditorErrorRaised, err)
 	}
 }
 

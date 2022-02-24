@@ -54,9 +54,14 @@ type (
 	SignalInt    int
 	SignalString string
 	SignalArray  []SignalValue
+	SignalError  struct {
+		Kind editorErrorKind
+		Msg  string
+	}
 )
 
 func (f SignalFloat) ToString() string  { return fmt.Sprint(f) }
 func (i SignalInt) ToString() string    { return fmt.Sprint(i) }
 func (s SignalString) ToString() string { return fmt.Sprint(s) }
 func (a SignalArray) ToString() string  { return fmt.Sprint(a) }
+func (e SignalError) ToString() string  { return fmt.Sprintf("%#v", e) }

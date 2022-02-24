@@ -14,11 +14,21 @@ const (
 	EditorLineChanged SignalKind = iota
 	EditorColumnChanged
 	EditorProjectOpened
+	EditorErrorRaised
 )
 
 const (
 	editorCloseBtn ui.ButtonID = iota
 	editorMinimizeBtn
+)
+
+type editorErrorKind int
+
+const (
+	editorDebug editorErrorKind = iota
+	editorWarning
+	editorError
+	editorFatalError
 )
 
 var ed *Editor
@@ -30,12 +40,14 @@ type Editor struct {
 	signals    signalDispatcher
 
 	// Editor's resources
-	font   Font
-	header Image
-	layout Image
-	cross  Image
-	dash   Image
-	theme  theme
+	font    Font
+	header  Image
+	layout  Image
+	cross   Image
+	dash    Image
+	warning Image
+	err     Image
+	theme   theme
 
 	window   ui.WinHandle
 	treeView treeview
@@ -73,6 +85,7 @@ func (ed *Editor) Update() error {
 
 		ed.textEd.updateTextEditor()
 		ed.cmdPanel.updateCmdPanel()
+		ed.statusbar.updateStatusBar()
 	}
 	return ed.closeState
 }
@@ -275,6 +288,22 @@ func NewEditor() *Editor {
 		panic(err)
 	}
 	ed.dash = Image{
+		data: i,
+	}
+
+	i, _, err = ebitenutil.NewImageFromFile("assets/uiWarning.png")
+	if err != nil {
+		panic(err)
+	}
+	ed.warning = Image{
+		data: i,
+	}
+
+	i, _, err = ebitenutil.NewImageFromFile("assets/uiError.png")
+	if err != nil {
+		panic(err)
+	}
+	ed.err = Image{
 		data: i,
 	}
 

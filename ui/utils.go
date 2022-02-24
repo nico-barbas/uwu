@@ -66,6 +66,8 @@ type (
 		Img    Image
 		Constr Constraint
 	}
+
+	TextAlign int
 )
 
 func (c Color) RGBA() (r, g, b, a uint32) {
@@ -94,6 +96,13 @@ const (
 const (
 	BackgroundSolidColor BackgroundKind = iota
 	BackgroundImageSlice
+)
+
+const (
+	TextAlignCenter TextAlign = iota
+	TextAlignCenterLeft
+	TextAlignCenterRight
+	// TODO: Add top and bottom aligns
 )
 
 func (b Background) entry(rect Rectangle) RenderEntry {
