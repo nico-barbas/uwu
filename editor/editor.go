@@ -83,17 +83,13 @@ func (ed *Editor) Draw(screen *ebiten.Image) {
 		switch e.Kind {
 		case ui.RenderText:
 			font := e.Font.(*Font)
-			// FIXME: This is a bit hacky.
-			// It isn't wrong, but it centers the text at the bottom of the "line"
-			// Should provide more options such as center to middle
-			// Instead of offsetting with the font size, offset by the text height
-			// if user wants to center to middle
+			ascent := font.Ascent(e.Rect.Height)
 			text.Draw(
 				screen,
 				e.Text,
 				font.faces[int(e.Rect.Height)],
 				int(e.Rect.X),
-				int(e.Rect.Y+e.Rect.Height),
+				int(e.Rect.Y+ascent),
 				e.Clr,
 			)
 		case ui.RenderRectangle:

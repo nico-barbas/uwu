@@ -93,6 +93,8 @@ func (c *CmdPanel) updateCmdPanel() {
 
 			c.textBox.EmptyCharBuffer()
 			c.window.SetActive(false)
+		} else if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+			c.window.SetActive(false)
 		}
 	}
 }

@@ -46,6 +46,11 @@ func (f *Font) GlyphAdvance(r rune, size float64) float64 {
 	return float64(x>>6) + float64(x&((1<<6)-1))/float64(1<<6)
 }
 
+func (f *Font) Ascent(size float64) float64 {
+	x := f.faces[int(size)].Metrics().Ascent
+	return float64(x>>6) + float64(x&((1<<6)-1))/float64(1<<6)
+}
+
 func (f *Font) MeasureText(t string, size float64) ui.Point {
 	measure := ui.Point{}
 
