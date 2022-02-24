@@ -82,6 +82,7 @@ func (ed *Editor) Update() error {
 			Right: ebiten.IsKeyPressed(ebiten.KeyRight),
 			Up:    ebiten.IsKeyPressed(ebiten.KeyUp),
 			Down:  ebiten.IsKeyPressed(ebiten.KeyDown),
+			Paste: ebiten.IsKeyPressed(ebiten.KeyControl) && ebiten.IsKeyPressed(ebiten.KeyV),
 		})
 
 		ed.textEd.updateTextEditor()

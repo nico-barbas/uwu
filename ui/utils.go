@@ -21,6 +21,11 @@ type (
 		MeasureText(text string, size float64) Point
 	}
 
+	Clipboard interface {
+		ReadClipboard() string
+		WriteClipboard(string)
+	}
+
 	Image interface {
 		GetWidth() float64
 		GetHeight() float64
@@ -204,6 +209,9 @@ const (
 	keyDown
 	keyLeft
 	keyRight
+	keyCopy
+	keyCut
+	keyPaste
 	keyMax
 )
 
@@ -238,6 +246,10 @@ type (
 		Down  bool
 		Left  bool
 		Right bool
+
+		Copy  bool
+		Cut   bool
+		Paste bool
 	}
 
 	CursorShape int

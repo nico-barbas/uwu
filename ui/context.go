@@ -118,7 +118,7 @@ func getWindow(h WinHandle) *Window {
 	return &node.win
 }
 
-// Function used internally!
+// Function used internally
 // Reset the memory and all the handles
 func (c *Context) freeAllWindows() {
 	c.head = nil
@@ -152,6 +152,9 @@ func (c *Context) UpdateUI(data Input) {
 		c.input.keys[keyDown] = data.Down
 		c.input.keys[keyLeft] = data.Left
 		c.input.keys[keyRight] = data.Right
+		c.input.keys[keyCopy] = data.Copy
+		c.input.keys[keyCut] = data.Cut
+		c.input.keys[keyPaste] = data.Paste
 
 		for i := range c.input.keyCounts {
 			if c.input.keys[i] {

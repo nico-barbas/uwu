@@ -8,6 +8,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/nico-ec/uwu/clipboard"
 	"github.com/nico-ec/uwu/ui"
 )
 
@@ -44,11 +45,14 @@ func newTextEditor(parent ui.Container) textEditor {
 	return textEd
 }
 
+// Extend the features of ui.TextBox and handle more input kind
 func (t *textEditor) updateTextEditor() {
 	textBox, ok := t.tabViewer.ActiveTab().(*ui.TextBox)
 	if !ok {
 		return
 	}
+
+	// Check if line or column changed and fire signal
 	ln, col := textBox.CurrentLine(), textBox.CurrentColumn()
 	switch {
 	case ln != t.previousLine:
@@ -60,8 +64,16 @@ func (t *textEditor) updateTextEditor() {
 		t.previousColumn = col
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyControl) && inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		t.saveNode()
+	// Advanced input handling that textbox doesn't handle
+	if ebiten.IsKeyPressed(ebiten.KeyControl) {
+		switch {
+		case inpututil.IsKeyJustPressed(ebiten.KeyS):
+			t.saveNode()
+		}
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyEnd) {
+		textBox.MoveCursorLineEnd()
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyHome) {
+		textBox.MoveCursorLineStart()
 	}
 }
 
@@ -86,6 +98,7 @@ func (t *textEditor) saveNode() {
 	if err != nil {
 		panic(err)
 	}
+
 }
 
 func (t *textEditor) loadNode(node projectNode) {
@@ -143,9 +156,22 @@ func (t *textEditor) loadNode(node projectNode) {
 			Keyword: theme.syntaxKeywordClr,
 			Digit:   theme.syntaxNumberClr,
 		})
+		textBox.SetClipboardCallback(t)
 		t.tabViewer.AddTab(name, textBox)
 		textBox.LoadBufferData(d)
 	} else {
 		t.tabViewer.SetActiveTab(name)
 	}
+}
+
+func (t *textEditor) ReadClipboard() string {
+	data, err := clipboard.ReadClipboard()
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+func (t *textEditor) WriteClipboard(s string) {
+	panic("Writing to clipboard not implemented yet")
 }

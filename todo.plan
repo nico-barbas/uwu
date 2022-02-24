@@ -4,9 +4,9 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -470.0095520019531,
-  "Pan.Y": -455.65716552734375,
-  "ZoomLevel": 4,
+  "Pan.X": -571.42822265625,
+  "Pan.Y": -226.37745666503906,
+  "ZoomLevel": 3,
   "TaskTransparency": 5,
   "OutlineTasks": true,
   "BracketSubtasks": true,
@@ -161,7 +161,8 @@
       "Description": "Text auto-indentation",
       "Selected": false,
       "TaskType.CurrentChoice": 0,
-      "CreationTime": "Feb 13 2022 19:07:52"
+      "CreationTime": "Feb 13 2022 19:07:52",
+      "CompletionTime": "Feb 24 2022 17:14:34"
     }, 
     {
       "BoardIndex": 0,
@@ -580,9 +581,21 @@
       "Progression.Current": 0,
       "Progression.Max": 0,
       "Description": "Add icon to treeview",
-      "Selected": true,
+      "Selected": false,
       "TaskType.CurrentChoice": 0,
       "CreationTime": "Feb 24 2022 13:52:10"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 416,
+      "Position.Y": 112,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Treeview nested folder don't render properly",
+      "Selected": true,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 24 2022 19:55:57"
     }
   ]
 }
