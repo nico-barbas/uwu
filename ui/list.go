@@ -40,9 +40,11 @@ type (
 	}
 
 	ListItem struct {
-		ItemName string
-		origin   Point
-		height   float64
+		ItemName       string
+		ItemIcon       Image
+		ItemIconOffset float64
+		origin         Point
+		height         float64
 	}
 
 	ListReceiver interface {
@@ -162,7 +164,7 @@ func (s *SubList) AddItem(i ListNode, indentSize float64, lineSize float64) {
 			s.origin[0] + indentSize,
 			0,
 		})
-		i.setHeight(lineSize)
+		i.setHeight(lineSize + 2)
 	} else {
 		log.Printf("List %s already has a child with name %s", s.Name(), name)
 	}
@@ -228,7 +230,7 @@ func (s *SubList) draw(buf *renderBuffer, f Font, size float64, clr Color) float
 		Font: f,
 		Text: s.ItemName,
 	})
-	yPtr := size
+	yPtr := s.nameHeight
 	if !s.Collapsed {
 		for i := 0; i < s.count; i += 1 {
 			item := s.items[i]
@@ -301,9 +303,18 @@ func (l *ListItem) Name() string {
 
 func (l *ListItem) draw(buf *renderBuffer, f Font, size float64, clr Color) float64 {
 	buf.addEntry(RenderEntry{
+		Kind: RenderImage,
+		Rect: Rectangle{
+			X: l.origin[0],
+			Y: l.origin[1] - l.ItemIconOffset,
+		},
+		Img: l.ItemIcon,
+		Clr: clr,
+	})
+	buf.addEntry(RenderEntry{
 		Kind: RenderText,
 		Rect: Rectangle{
-			X:      l.origin[0],
+			X:      l.origin[0] + l.ItemIcon.GetWidth(),
 			Y:      l.origin[1],
 			Height: size,
 		},
@@ -311,7 +322,7 @@ func (l *ListItem) draw(buf *renderBuffer, f Font, size float64, clr Color) floa
 		Font: f,
 		Text: l.ItemName,
 	})
-	return size
+	return l.height
 }
 
 func (l *ListItem) getOrigin() Point {

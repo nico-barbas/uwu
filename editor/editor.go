@@ -47,6 +47,7 @@ type Editor struct {
 	dash    Image
 	warning Image
 	err     Image
+	file    Image
 	theme   theme
 
 	window   ui.WinHandle
@@ -304,6 +305,14 @@ func NewEditor() *Editor {
 		panic(err)
 	}
 	ed.err = Image{
+		data: i,
+	}
+
+	i, _, err = ebitenutil.NewImageFromFile("assets/uiFile.png")
+	if err != nil {
+		panic(err)
+	}
+	ed.file = Image{
 		data: i,
 	}
 

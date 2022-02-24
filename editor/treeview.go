@@ -48,7 +48,11 @@ func (t *treeview) loadProject(p *project) {
 			t.list.AddItem(&subList)
 			populateSubList(&subList, f)
 		case file:
-			t.list.AddItem(&ui.ListItem{ItemName: k})
+			t.list.AddItem(&ui.ListItem{
+				ItemName:       k,
+				ItemIcon:       &ed.file,
+				ItemIconOffset: 1,
+			})
 		}
 	}
 	t.list.SortList()
@@ -66,7 +70,12 @@ func populateSubList(l *ui.SubList, f *folder) {
 			populateSubList(&subList, f)
 			l.AddItem(&subList, 10, 12)
 		case file:
-			l.AddItem(&ui.ListItem{ItemName: k}, 10, 12)
+			item := &ui.ListItem{
+				ItemName:       k,
+				ItemIcon:       &ed.file,
+				ItemIconOffset: 1,
+			}
+			l.AddItem(item, 10, 12)
 		}
 	}
 }
