@@ -4,9 +4,9 @@
   "BoardIndex": 0,
   "BoardCount": 1,
   "AutoSave": true,
-  "Pan.X": -504.80621337890625,
-  "Pan.Y": -357.7967529296875,
-  "ZoomLevel": 3,
+  "Pan.X": -470.0095520019531,
+  "Pan.Y": -455.65716552734375,
+  "ZoomLevel": 4,
   "TaskTransparency": 5,
   "OutlineTasks": true,
   "BracketSubtasks": true,
@@ -552,13 +552,37 @@
       "BoardIndex": 0,
       "Position.X": 192,
       "Position.Y": 576,
+      "Checkbox.Checked": true,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Text Alignment for Label",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 24 2022 13:19:14"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 672,
+      "Position.Y": 304,
       "Checkbox.Checked": false,
       "Progression.Current": 0,
       "Progression.Max": 0,
-      "Description": "Text Alignment",
+      "Description": "Add Timer and Tweening",
+      "Selected": false,
+      "TaskType.CurrentChoice": 0,
+      "CreationTime": "Feb 24 2022 13:47:03"
+    }, 
+    {
+      "BoardIndex": 0,
+      "Position.X": 192,
+      "Position.Y": 592,
+      "Checkbox.Checked": false,
+      "Progression.Current": 0,
+      "Progression.Max": 0,
+      "Description": "Add icon to treeview",
       "Selected": true,
       "TaskType.CurrentChoice": 0,
-      "CreationTime": "Feb 24 2022 13:19:14"
+      "CreationTime": "Feb 24 2022 13:52:10"
     }
   ]
 }
