@@ -1,5 +1,5 @@
 # UWU
-This is a prototype of a gpu accelerated text editor. It isn't really usable in the current state / it is lacking a lot of features.
+This is a prototype of a gpu accelerated text editor.
 
 ! WINDOWS ONLY !
 
